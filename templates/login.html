@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 mt-5">
+        <div class="card shadow border-0">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4 text-primary fw-bold">Doctor Login</h2>
+                
+                <form action="/login" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold">Login</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a href="#" class="text-muted small">Forgot Password?</a>
+                    <hr>
+                    <p class="mb-0">Need an account? <a href="/register" class="text-decoration-none fw-bold">Register Now</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
