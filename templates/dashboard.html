@@ -28,9 +28,32 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for patient in patients %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted">No patients found. Click "Add New Patient" to start.</td>
+                        <td>{{ patient.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="/{{ patient.patient_img }}" alt="img" class="rounded-circle me-2"
+                                    style="width: 40px; height: 40px; object-fit: cover;">
+                                <div>
+                                    <div class="fw-bold">{{ patient.first_name }} {{ patient.last_name }}</div>
+                                    <div class="small text-muted">Next: {{ patient.appt_date }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ patient.age }}</td>
+                        <td>{{ patient.gender }}</td>
+                        <td>{{ patient.insurance_number }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
                     </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No patients found. Click "Add New Patient" to
+                            start.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
