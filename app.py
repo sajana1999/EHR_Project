@@ -14,7 +14,7 @@ def get_db_connection():
     return pymysql.connect(
         host='localhost',
         user='root',
-        password='SAJANA123*', # <--- CHANGE THIS to your MySQL password
+        password='root*', # <--- CHANGE THIS to your MySQL password
         database='ehr_system',
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -22,8 +22,8 @@ def get_db_connection():
 @app.route('/')
 def home():
 
-    # This now shows the layout's home state
-    return render_template('layout.html')
+    # Redirect to the login page
+    return redirect(url_for('login'))
 
 @app.route('/about')
 def about():
@@ -39,6 +39,16 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        doctor_medical_id = request.form.get('doctor_medical_id')
+        category = request.form.get('category')
+
+        # Check if passwords match
+        if password != confirm_password:
+             return "<h1>Passwords do not match!</h1><a href='/register'>Try Again</a>"
         
         # 2. Scramble the password for security
         hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -49,14 +59,18 @@ def register():
             cur = conn.cursor()
             
             # The SQL command to "Insert" the new doctor
-            cur.execute("INSERT INTO doctors (username, email, password) VALUES (%s, %s, %s)", 
-                        (username, email, hashed_pw))
+            cur.execute("""
+                INSERT INTO doctors 
+                (username, email, password, first_name, last_name, doctor_medical_id, category, is_verified) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (username, email, hashed_pw, first_name, last_name, doctor_medical_id, category, False))
             
             conn.commit() # This "saves" the changes to the database
             cur.close()
             conn.close()
             
-            # If successful, send them to the login page
+            # If successful, send them to the login page (or verification page eventually)
+            # For now, let's redirect to login but maybe with a message (simulated verification later)
             return redirect(url_for('login'))
             
         except Exception as e:
@@ -99,9 +113,23 @@ def login():
     
 @app.route('/dashboard')
 def dashboard():
-    if 'logged_in' in session:
-        return f"<h1>Welcome Dr. {session['username']}! This is your private Dashboard.</h1>"
-    return redirect(url_for('login'))
+    # Check if the doctor is logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    
+    # Connect to database to get this doctor's patients
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # We only want patients that belong to THIS doctor
+    cur.execute("SELECT * FROM patients WHERE doctor_id = %s", (session['doctor_id'],))
+    patients = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    
+    # Send the patient list to the HTML page
+    return render_template('dashboard.html', patients=patients)
 
 @app.route('/logout')
 def logout():

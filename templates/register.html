@@ -8,28 +8,78 @@
                 <h2 class="text-center mb-4 text-primary fw-bold">Doctor Registration</h2>
                 <p class="text-center text-muted mb-4">Create your account to access the EHR system.</p>
 
-                <form action="/register" method="POST" id="registrationForm">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Username</label>
-                        <input type="text" name="username" class="form-control" placeholder="e.g. DrSmith2026" required>
+                <form action="/register" method="POST" id="registerForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">First Name</label>
+                            <input type="text" name="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" required>
+                        </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="hospital@example.com" required>
+                        <label class="form-label fw-semibold">Medical License ID</label>
+                        <input type="text" name="doctor_medical_id" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Specialization Category</label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select Category...</option>
+                            <option value="General Practitioner">General Practitioner</option>
+                            <option value="Cardiologist">Cardiologist</option>
+                            <option value="Dermatologist">Dermatologist</option>
+                            <option value="Pediatrician">Pediatrician</option>
+                            <option value="Neurologist">Neurologist</option>
+                            <option value="Psychiatrist">Psychiatrist</option>
+                            <option value="Surgeon">Surgeon</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="email" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Password</label>
-                        <input type="password" name="password" id="pwInput" class="form-control" placeholder="Enter a secure password" required onkeyup="validatePassword()">
-                        
-                        <div id="passwordChecklist" class="mt-3 p-3 bg-light rounded border border-secondary-subtle" style="font-size: 0.85rem;">
-                            <p class="mb-2 fw-bold">Security Requirements:</p>
-                            <div id="lenCheck" class="text-danger mb-1">✘ Minimum 8 characters</div>
-                            <div id="upperCheck" class="text-danger mb-1">✘ At least one uppercase letter (A-Z)</div>
-                            <div id="numCheck" class="text-danger mb-1">✘ At least one number (0-9)</div>
-                            <div id="specialCheck" class="text-danger mb-0">✘ At least one special symbol (!@#$%^&*)</div>
+                        <input type="password" name="password" id="password" class="form-control" required
+                            onkeyup="validateForm()">
+
+                        <!-- Password Strength Meter -->
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
                         </div>
+
+                        <!-- Password Checklist -->
+                        <div id="passwordChecklist"
+                            class="mt-2 p-3 bg-light rounded border border-secondary-subtle small">
+                            <div id="lenCheck" class="text-danger">✘ Minimum 8 characters</div>
+                            <div id="upperCheck" class="text-danger">✘ At least one uppercase letter</div>
+                            <div id="numCheck" class="text-danger">✘ At least one number</div>
+                            <div id="specialCheck" class="text-danger">✘ At least one special symbol (!@#$%^&*)</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Confirm Password</label>
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control"
+                            required onkeyup="validateForm()">
+                        <div id="matchCheck" class="mt-1 text-danger small d-none">✘ Passwords do not match</div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="showPassword">
+                        <label class="form-check-label" for="showPassword">Show Password</label>
                     </div>
 
                     <div class="d-grid mt-4">
@@ -40,20 +90,33 @@
                 </form>
 
                 <hr class="my-4">
-                <p class="text-center mb-0">Already registered? <a href="/login" class="text-primary text-decoration-none fw-bold">Login Here</a></p>
+                <p class="text-center mb-0">Already registered? <a href="/login"
+                        class="text-primary text-decoration-none fw-bold">Login Here</a></p>
             </div>
         </div>
     </div>
 </div>
 
-
-
 <script>
-    function validatePassword() {
-        const password = document.getElementById('pwInput').value;
-        const btn = document.getElementById('submitBtn');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const submitBtn = document.getElementById('submitBtn');
+    const matchMsg = document.getElementById('matchCheck');
+    const showPassword = document.getElementById('showPassword');
+    const strengthBar = document.getElementById('strengthBar');
 
-        // Define the rules
+    // Show Password Toggle
+    showPassword.addEventListener('change', function () {
+        const type = this.checked ? 'text' : 'password';
+        passwordInput.type = type;
+        confirmInput.type = type;
+    });
+
+    function validateForm() {
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+
+        // 1. Check Strength
         const requirements = {
             len: password.length >= 8,
             upper: /[A-Z]/.test(password),
@@ -61,15 +124,49 @@
             special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
         };
 
-        // Update the UI checklist
+        let strength = 0;
+        if (requirements.len) strength++;
+        if (requirements.upper) strength++;
+        if (requirements.num) strength++;
+        if (requirements.special) strength++;
+
+        // Update Bar
+        const percentage = (strength / 4) * 100;
+        strengthBar.style.width = percentage + '%';
+
+        if (strength <= 1) strengthBar.className = 'progress-bar bg-danger';
+        else if (strength <= 3) strengthBar.className = 'progress-bar bg-warning';
+        else strengthBar.className = 'progress-bar bg-success';
+
+        // Update Checklist
         updateIndicator('lenCheck', requirements.len, "Minimum 8 characters");
-        updateIndicator('upperCheck', requirements.upper, "At least one uppercase letter (A-Z)");
-        updateIndicator('numCheck', requirements.num, "At least one number (0-9)");
+        updateIndicator('upperCheck', requirements.upper, "At least one uppercase letter");
+        updateIndicator('numCheck', requirements.num, "At least one number");
         updateIndicator('specialCheck', requirements.special, "At least one special symbol (!@#$%^&*)");
 
-        // Enable button only if all requirements are green
-        const allValid = Object.values(requirements).every(val => val === true);
-        btn.disabled = !allValid;
+        // 2. Check Match
+        const isMatch = password === confirm && password.length > 0;
+        if (confirm.length > 0) {
+            matchMsg.classList.remove('d-none');
+            if (isMatch) {
+                matchMsg.innerHTML = "✔ Passwords match";
+                matchMsg.classList.replace('text-danger', 'text-success');
+            } else {
+                matchMsg.innerHTML = "✘ Passwords do not match";
+                matchMsg.classList.replace('text-success', 'text-danger');
+            }
+        } else {
+            matchMsg.classList.add('d-none');
+        }
+
+        // 3. Enable/Disable Button
+        const allReqsMet = Object.values(requirements).every(val => val === true);
+
+        if (allReqsMet && isMatch) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
     }
 
     function updateIndicator(id, isValid, text) {

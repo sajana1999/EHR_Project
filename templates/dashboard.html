@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-primary">Welcome, Dr. {{ session['username'] }}</h2>
+            <p class="text-muted">Manage your patients and medical records below.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/add_patient" class="btn btn-success fw-bold">+ Add New Patient</a>
+            <a href="/logout" class="btn btn-outline-danger ms-2">Logout</a>
+        </div>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Patient List</h5>
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Insurance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No patients found. Click "Add New Patient" to start.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
