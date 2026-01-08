@@ -4,7 +4,7 @@ def get_db_connection():
     return pymysql.connect(
         host='localhost',
         user='root',
-        password='root*',
+        password='',
         database='ehr_system',
         cursorclass=pymysql.cursors.DictCursor
     )
