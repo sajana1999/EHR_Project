@@ -2,42 +2,42 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow mb-5">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0">Add New Patient Record</h4>
+        <div class="card shadow border-0 mb-5" style="border-radius: 15px;">
+            <div class="card-header bg-success text-white py-3" style="border-radius: 15px 15px 0 0;">
+                <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add New Patient Record</h4>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form action="/add_patient" method="POST" enctype="multipart/form-data">
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">First Name</label>
-                            <input type="text" name="first_name" class="form-control" required>
+                            <label class="form-label fw-bold">First Name</label>
+                            <input type="text" name="first_name" class="form-control shadow-sm" placeholder="e.g. John" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" name="last_name" class="form-control" required>
+                            <label class="form-label fw-bold">Last Name</label>
+                            <input type="text" name="last_name" class="form-control shadow-sm" placeholder="e.g. Doe" required>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label">Insurance Number</label>
-                            <input type="text" name="insurance_number" class="form-control" required>
+                            <label class="form-label fw-bold">Insurance Number</label>
+                            <input type="text" name="insurance_number" class="form-control shadow-sm" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Age</label>
-                            <input type="number" name="age" class="form-control" required>
+                            <label class="form-label fw-bold">Age</label>
+                            <input type="number" name="age" class="form-control shadow-sm" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Weight (kg)</label>
-                            <input type="number" step="0.1" name="weight" class="form-control" required>
+                            <label class="form-label fw-bold">Weight (kg)</label>
+                            <input type="number" step="0.1" name="weight" class="form-control shadow-sm" required>
                         </div>
                     </div>
 
-                    <div class="row mb-3">
+                    <div class="row mb-3 align-items-center">
                         <div class="col-md-6">
-                            <label class="form-label d-block">Gender</label>
+                            <label class="form-label d-block fw-bold">Gender</label>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="gender" value="Male" checked>
                                 <label class="form-check-label">Male</label>
@@ -49,33 +49,90 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label d-block">Allergies</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="allergies" value="Yes"
-                                    id="allergyCheck">
-                                <label class="form-check-label" for="allergyCheck">Patient has known allergies</label>
+                            <label class="form-label d-block fw-bold">Allergies</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="allergies" value="Yes" id="allergyCheck">
+                                <label class="form-check-label text-muted" for="allergyCheck">Patient has known allergies</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Next Appointment Date (JS Datepicker)</label>
-                        <input type="text" name="appt_date" id="datepicker" class="form-control"
-                            placeholder="Select Date" required>
+                        <label class="form-label fw-bold">Next Appointment Date</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-calendar-alt text-success"></i></span>
+                            <input type="text" name="appt_date" id="datepicker" class="form-control bg-white shadow-sm" placeholder="Select Date" required>
+                        </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Medical History / Notes</label>
-                        <textarea name="history" class="form-control" rows="3"></textarea>
+                        <label class="form-label fw-bold">Medical History / Notes</label>
+                        <textarea name="history" class="form-control shadow-sm" rows="3" placeholder="Enter previous conditions, surgeries, or current medications..."></textarea>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label">Radiology Image / Patient Photo</label>
-                        <input type="file" name="patient_img" class="form-control" accept="image/*" required>
+                        <label class="form-label fw-bold">Patient Profile Photo</label>
+                        <input type="file" name="patient_img" class="form-control" accept="image/*">
+                        <div class="form-text">Optional. Default icon will be used if left blank.</div>
                     </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success btn-lg">Save Patient EHR</button>
+                    <div class="p-3 mb-4 rounded" style="background-color: #f8f9fa; border: 1px dashed #28a745;">
+                        <h5 class="text-success fw-bold mb-3"><i class="fas fa-images me-2"></i>Radiology & Clinical Reports</h5>
+                        <div class="row">
+                            <div class="p-4 mb-4 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+    <h5 class="text-primary fw-bold mb-3"><i class="fas fa-file-medical me-2"></i>Radiology & Clinical Reports</h5>
+    
+    <div id="document-container">
+        <div class="row doc-row mb-3 border-bottom pb-3">
+            <div class="col-md-6">
+                <label class="form-label small fw-bold">Select File (X-ray/Report)</label>
+                <input type="file" name="medical_docs" class="form-control shadow-sm" accept="image/*,.pdf">
+            </div>
+            <div class="col-md-5">
+                <label class="form-label small fw-bold">Date for THIS document</label>
+                <input type="date" name="doc_dates" class="form-control shadow-sm">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger btn-sm remove-row" style="display:none;">&times;</button>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" id="add-more-docs" class="btn btn-sm btn-primary mt-2">
+        <i class="fas fa-plus me-1"></i> + Add Another Document
+    </button>
+</div>
+
+<script>
+document.getElementById('add-more-docs').addEventListener('click', function() {
+    const container = document.getElementById('document-container');
+    const rows = document.querySelectorAll('.doc-row');
+    const newRow = rows[0].cloneNode(true); // Clone the first row
+    
+    // Clear the inputs so they are empty for the new file
+    newRow.querySelectorAll('input').forEach(input => input.value = '');
+    
+    // Show the "X" remove button on all new rows
+    newRow.querySelector('.remove-row').style.display = 'block';
+    
+    container.appendChild(newRow);
+});
+
+// Logic to remove a row when 'X' is clicked
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('remove-row')) {
+        e.target.closest('.doc-row').remove();
+    }
+});
+</script>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg shadow">
+                            <i class="fas fa-save me-2"></i>Save Patient EHR
+                        </button>
+                        <a href="/dashboard" class="btn btn-link text-muted">Cancel and go back</a>
                     </div>
                 </form>
             </div>
@@ -90,6 +147,7 @@
         altInput: true,
         altFormat: "F j, Y",
         dateFormat: "Y-m-d",
+        minDate: "today"
     });
 </script>
 {% endblock %}
