@@ -163,14 +163,24 @@ def add_patient():
 
 @app.route('/delete_patient/<int:id>')
 def delete_patient(id):
-    if 'logged_in' not in session: return redirect(url_for('login'))
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("DELETE FROM patients WHERE id = %s AND doctor_id = %s", (id, session['doctor_id']))
-    conn.commit()
-    cur.close()
-    conn.close()
-    flash("Patient record deleted.", "info")
+    
+    try:
+        # Delete the patient (This also deletes their documents due to ON DELETE CASCADE)
+        cur.execute("DELETE FROM patients WHERE id = %s AND doctor_id = %s", (id, session['doctor_id']))
+        conn.commit()
+        flash("Patient record has been successfully deleted.", "info")
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error deleting record: {str(e)}", "danger")
+    finally:
+        cur.close()
+        conn.close()
+        
     return redirect(url_for('dashboard'))
 
 @app.route('/patient/<int:patient_id>')

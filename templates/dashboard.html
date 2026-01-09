@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
     /* Professional Medical Theme CSS */
     body { background-color: #f4f7f6; }
@@ -90,14 +91,16 @@
                             <code class="text-primary fw-bold">{{ patient.insurance_number }}</code>
                         </td>
                         <td class="text-end pe-4">
-                            <div class="btn-group btn-group-custom shadow-sm rounded">
-                                <a href="/patient/{{ patient.id }}" class="btn btn-sm btn-outline-primary btn-view-custom">
+                            <div class="btn-group shadow-sm rounded">
+                                <a href="/patient/{{ patient.id }}" class="btn btn-sm btn-outline-primary">
                                     View Record
                                 </a>
+
                                 <a href="/patient/{{ patient.id }}/radiology" class="btn btn-sm btn-outline-info fw-bold">
                                     Reports
                                 </a>
-                                <button onclick="confirmDelete('{{ patient.id }}')" class="btn btn-sm btn-outline-danger">
+
+                                <button type="button" onclick="deletePatient('{{ patient.id }}')" class="btn btn-sm btn-outline-danger">
                                     Delete
                                 </button>
                             </div>
@@ -124,4 +127,28 @@ function confirmDelete(id) {
     }
 }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function deletePatient(patientId) {
+    Swal.fire({
+        title: 'Delete Patient Record?',
+        text: "This will permanently remove all medical history and X-ray files!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, Delete Everything',
+        cancelButtonText: 'No, Keep Record',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // This redirects the browser to the Python delete route
+            window.location.href = "/delete_patient/" + patientId;
+        }
+    })
+}
+</script>
+
 {% endblock %}
