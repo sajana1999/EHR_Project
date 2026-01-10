@@ -3,6 +3,7 @@ import uuid
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_bcrypt import Bcrypt
 import pymysql
+from flask import send_from_directory
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -91,12 +92,31 @@ def login():
 def dashboard():
     if 'logged_in' not in session:
         return redirect(url_for('login'))
+    
+    # Get the search term from the URL (if any)
+    search_query = request.args.get('search', '').strip()
+    
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM patients WHERE doctor_id = %s", (session['doctor_id'],))
+    
+    if search_query:
+        # Search by first_name, last_name, or insurance_number
+        # Using %s with % around it allows "partial" matches (e.g. 'jo' matches 'John')
+        sql = """
+            SELECT * FROM patients 
+            WHERE doctor_id = %s 
+            AND (first_name LIKE %s OR last_name LIKE %s OR insurance_number LIKE %s)
+        """
+        like_pattern = f"%{search_query}%"
+        cur.execute(sql, (session['doctor_id'], like_pattern, like_pattern, like_pattern))
+    else:
+        # No search? Show all patients for this doctor
+        cur.execute("SELECT * FROM patients WHERE doctor_id = %s", (session['doctor_id'],))
+    
     patients = cur.fetchall()
     cur.close()
     conn.close()
+    
     return render_template('dashboard.html', patients=patients)
 
 @app.route('/add_patient', methods=['GET', 'POST'])
@@ -207,10 +227,120 @@ def view_radiology(patient_id):
     conn.close()
     return render_template('radiology_gallery.html', patient=patient, documents=documents)
 
+@app.route('/edit_patient/<int:id>')
+def edit_patient(id):
+    if 'logged_in' not in session: return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # 1. Get the Patient's main data
+    cur.execute("SELECT * FROM patients WHERE id = %s", (id,))
+    patient = cur.fetchone()
+    
+    # 2. Get all the X-rays/Reports for this specific patient
+    cur.execute("SELECT * FROM patient_documents WHERE patient_id = %s", (id,))
+    documents = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    
+    return render_template('edit_patient.html', patient=patient, documents=documents)
+
+@app.route('/update_patient/<int:id>', methods=['POST'])
+def update_patient(id):
+    if 'logged_in' not in session: return redirect(url_for('login'))
+    
+    # 1. Collect all text fields
+    f_name = request.form.get('first_name')
+    l_name = request.form.get('last_name')
+    ins = request.form.get('insurance_number')
+    age = request.form.get('age')
+    weight = request.form.get('weight')
+    gender = request.form.get('gender')
+    history = request.form.get('history')
+    appt = request.form.get('appt_date')
+    # Handle checkbox value
+    allergies = "Yes" if request.form.get('allergies') else "No"
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        # 2. Check if a NEW photo was uploaded
+        if 'patient_img' in request.files and request.files['patient_img'].filename != '':
+            file = request.files['patient_img']
+            filename = uuid.uuid4().hex + "_" + secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            new_path = f"uploads/{filename}"
+            
+            # Update including the NEW photo path
+            query = """UPDATE patients SET first_name=%s, last_name=%s, insurance_number=%s, age=%s, 
+                       weight=%s, gender=%s, medical_history=%s, appt_date=%s, allergies=%s, patient_img=%s
+                       WHERE id=%s AND doctor_id=%s"""
+            cur.execute(query, (f_name, l_name, ins, age, weight, gender, history, appt, allergies, new_path, id, session['doctor_id']))
+        else:
+            # Update everything EXCEPT the photo
+            query = """UPDATE patients SET first_name=%s, last_name=%s, insurance_number=%s, age=%s, 
+                       weight=%s, gender=%s, medical_history=%s, appt_date=%s, allergies=%s
+                       WHERE id=%s AND doctor_id=%s"""
+            cur.execute(query, (f_name, l_name, ins, age, weight, gender, history, appt, allergies, id, session['doctor_id']))
+
+        conn.commit()
+        flash("Medical record successfully synchronized.", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error: {str(e)}", "danger")
+    finally:
+        cur.close()
+        conn.close()
+        
+    return redirect(url_for('dashboard'))
+
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+@app.route('/delete_report/<int:doc_id>')
+def delete_report(doc_id):
+    patient_id = request.args.get('patient_id')
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Delete the record from the documents table
+    cur.execute("DELETE FROM patient_documents WHERE id = %s", (doc_id,))
+    
+    conn.commit()
+    cur.close()
+    conn.close()
+    
+    flash("Report removed.", "info")
+    return redirect(url_for('edit_patient', id=patient_id))
+
+@app.route('/download_report/<int:doc_id>')
+def download_report(doc_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Get the file path from the database
+    cur.execute("SELECT file_path FROM patient_documents WHERE id = %s", (doc_id,))
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    
+    if result:
+        # result['file_path'] looks like "uploads/filename.jpg"
+        # We need to split the folder name from the actual filename
+        folder = os.path.join(app.root_path, 'static', 'uploads')
+        filename = result['file_path'].split('/')[-1]
+        
+        return send_from_directory(folder, filename, as_attachment=True)
+    
+    return "File not found", 404
 
 if __name__ == '__main__':
     app.run(debug=True)
