@@ -205,11 +205,20 @@ def delete_patient(id):
 
 @app.route('/patient/<int:patient_id>')
 def view_patient(patient_id):
-    if 'logged_in' not in session: return redirect(url_for('login'))
+    if 'logged_in' not in session: 
+        return redirect(url_for('login'))
+        
     conn = get_db_connection()
     cur = conn.cursor()
+    
+    # 1. NEW: Mark the patient as "Seen" (Turns off the red dot)
+    cur.execute("UPDATE patients SET is_seen = 1 WHERE id = %s", (patient_id,))
+    conn.commit()
+    
+    # 2. Existing code: Get patient details
     cur.execute("SELECT * FROM patients WHERE id = %s", (patient_id,))
     patient = cur.fetchone()
+    
     cur.close()
     conn.close()
     return render_template('patient_details.html', patient=patient)

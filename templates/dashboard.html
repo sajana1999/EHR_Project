@@ -40,6 +40,31 @@
         border: 2px solid #fff;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    /* The Perfect Red Notification Badge */
+    .new-badge {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 8px;
+        height: 8px;
+        background-color: #ff3b30; /* Medical Red */
+        border-radius: 50%;
+        border: 1px solid white;
+        box-shadow: 0 0 4px rgba(255, 59, 48, 0.6);
+        animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(255, 59, 48, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+    }
+
+    /* This ensures the dot stays inside the ID cell */
+    .id-cell {
+        position: relative;
+        padding-left: 20px !important; /* Space for the dot */
+    }
 </style>
 
 <div class="container mt-5">
@@ -89,7 +114,13 @@
                 <tbody>
                     {% for patient in patients %}
                     <tr>
-                        <td class="ps-4 text-muted">#{{ patient.id }}</td>
+                        <td class="id-cell ps-4 text-muted">
+    {% if patient.is_seen == 0 %}
+        <span class="new-badge" title="New Patient"></span>
+    {% endif %}
+    
+    #{{ patient.id }}
+</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <img src="{{ url_for('static', filename=patient.patient_img) }}" 
