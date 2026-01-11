@@ -6,7 +6,7 @@
         <div class="card shadow border-0">
             <div class="card-body p-5">
                 <h2 class="text-center mb-4 text-primary fw-bold">Doctor Login</h2>
-                
+
                 <form action="/login" method="POST">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Username</label>
@@ -22,9 +22,10 @@
                 </form>
 
                 <div class="text-center mt-4">
-                    <a href="#" class="text-muted small">Forgot Password?</a>
+                    <a href="{{ url_for('forgot_password') }}" class="text-muted small">Forgot Password?</a>
                     <hr>
-                    <p class="mb-0">Need an account? <a href="/register" class="text-decoration-none fw-bold">Register Now</a></p>
+                    <p class="mb-0">Need an account? <a href="/register" class="text-decoration-none fw-bold">Register
+                            Now</a></p>
                 </div>
             </div>
         </div>
