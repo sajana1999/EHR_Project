@@ -1,16 +1,50 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<div class="card shadow p-5">
-    <h1>About Our EHR System</h1>
-    <p class="lead">This Electronic Health Record system is designed to help doctors manage patient data securely and efficiently.</p>
-    <hr>
-    <h3>Key Features:</h3>
-    <ul>
-        <li>Secure Doctor Login</li>
-        <li>Patient Record Management (CRUD)</li>
-        <li>Image Upload for Radiology</li>
-        <li>Automated Appointment Scheduling</li>
-    </ul>
+<div class="row mb-5">
+    <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 fw-bold text-dark">About Our EHR Platform</h1>
+        <p class="lead text-muted">A comprehensive solution for modern clinical management and patient care.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 p-4 text-center">
+            <i class="bi bi-shield-check display-4 text-primary mb-3"></i>
+            <h5>Secure Data Access</h5>
+            <p class="small text-muted">Bank-grade encryption for all medical records and hashed doctor credentials.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4 text-center">
+            <i class="bi bi-images display-4 text-primary mb-3"></i>
+            <h5>Radiology Support</h5>
+            <p class="small text-muted">Integrated multimedia handling for patient X-rays and imaging documents.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4 text-center">
+            <i class="bi bi-envelope-check display-4 text-primary mb-3"></i>
+            <h5>Verified Workflows</h5>
+            <p class="small text-muted">Mandatory email verification and secure password recovery protocols.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row align-items-center bg-white p-5 rounded-4 shadow-sm">
+    <div class="col-md-6">
+        <h2 class="fw-bold mb-4">Our Commitment to Care</h2>
+        <p>Our EHR System is designed to reduce the administrative burden on healthcare providers. By centralizing
+            patient records, we enable doctors to focus more on treatment and less on paperwork.</p>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-check2-circle text-success me-2"></i> 360-degree Patient Viewing</li>
+            <li><i class="bi bi-check2-circle text-success me-2"></i> Real-time Database Updates</li>
+            <li><i class="bi bi-check2-circle text-success me-2"></i> Mobile-Responsive Dashboard</li>
+        </ul>
+    </div>
+    <div class="col-md-6 text-center">
+        <img src="https://img.freepik.com/free-photo/medical-technology-concept-doctor-using-digital-tablet_53876-152227.jpg"
+            class="img-fluid rounded-3 shadow" alt="Medical Technology">
+    </div>
 </div>
 {% endblock %}

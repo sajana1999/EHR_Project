@@ -1,183 +1,127 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
+<div class="row min-vh-100 align-items-center justify-content-center py-5">
     <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0 mt-5">
+        <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-5">
-                <h2 class="text-center mb-4 text-primary fw-bold">Doctor Registration</h2>
-                <p class="text-center text-muted mb-4">Create your account to access the EHR system.</p>
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-badge display-4 text-primary"></i>
+                    <h3 class="fw-bold mt-3">Provider Registration</h3>
+                    <p class="text-muted">Join the Medical Network</p>
+                </div>
 
-                <form action="/register" method="POST" id="registerForm">
+                <form method="POST" action="/register">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">First Name</label>
-                            <input type="text" name="first_name" class="form-control" required>
+                            <label class="form-label text-muted small fw-bold">FIRST NAME</label>
+                            <input type="text" name="first_name" class="form-control bg-light" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Last Name</label>
-                            <input type="text" name="last_name" class="form-control" required>
+                            <label class="form-label text-muted small fw-bold">LAST NAME</label>
+                            <input type="text" name="last_name" class="form-control bg-light" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold">MEDICAL ID</label>
+                            <input type="text" name="doctor_medical_id" class="form-control bg-light" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold">SPECIALTY/CATEGORY</label>
+                            <select name="category" class="form-select bg-light" required>
+                                <option value="" selected disabled>Select Specialty...</option>
+                                <option value="General Practitioner">General Practitioner</option>
+                                <option value="Cardiologist">Cardiologist</option>
+                                <option value="Dermatologist">Dermatologist</option>
+                                <option value="Pediatrician">Pediatrician</option>
+                                <option value="Orthopedic Surgeon">Orthopedic Surgeon</option>
+                                <option value="Neurologist">Neurologist</option>
+                                <option value="Radiologist">Radiologist</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Medical License ID</label>
-                        <input type="text" name="doctor_medical_id" class="form-control" required>
+                        <label class="form-label text-muted small fw-bold">EMAIL ADDRESS</label>
+                        <input type="email" name="email" class="form-control bg-light" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Specialization Category</label>
-                        <select name="category" class="form-select" required>
-                            <option value="">Select Category...</option>
-                            <option value="General Practitioner">General Practitioner</option>
-                            <option value="Cardiologist">Cardiologist</option>
-                            <option value="Dermatologist">Dermatologist</option>
-                            <option value="Pediatrician">Pediatrician</option>
-                            <option value="Neurologist">Neurologist</option>
-                            <option value="Psychiatrist">Psychiatrist</option>
-                            <option value="Surgeon">Surgeon</option>
-                            <option value="Other">Other</option>
-                        </select>
+                        <label class="form-label text-muted small fw-bold">USERNAME</label>
+                        <input type="text" name="username" class="form-control bg-light" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Username</label>
-                        <input type="text" name="username" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email</label>
-                        <input type="email" name="email" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Password</label>
-                        <input type="password" name="password" id="password" class="form-control" required
-                            onkeyup="validateForm()">
-
-                        <!-- Password Strength Meter -->
-                        <div class="progress mt-2" style="height: 5px;">
-                            <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold">PASSWORD</label>
+                            <div class="input-group">
+                                <input type="password" name="password" id="reg_password"
+                                    class="form-control bg-light border-end-0" required>
+                                <span class="input-group-text bg-light border-start-0 cursor-pointer"
+                                    onclick="togglePassword('reg_password', 'toggleRegIcon')">
+                                    <i class="bi bi-eye-slash text-muted" id="toggleRegIcon"></i>
+                                </span>
+                            </div>
                         </div>
-
-                        <!-- Password Checklist -->
-                        <div id="passwordChecklist"
-                            class="mt-2 p-3 bg-light rounded border border-secondary-subtle small">
-                            <div id="lenCheck" class="text-danger">✘ Minimum 8 characters</div>
-                            <div id="upperCheck" class="text-danger">✘ At least one uppercase letter</div>
-                            <div id="numCheck" class="text-danger">✘ At least one number</div>
-                            <div id="specialCheck" class="text-danger">✘ At least one special symbol (!@#$%^&*)</div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold">CONFIRM</label>
+                            <div class="input-group">
+                                <input type="password" name="confirm_password" id="reg_confirm"
+                                    class="form-control bg-light border-end-0" required>
+                                <span class="input-group-text bg-light border-start-0 cursor-pointer"
+                                    onclick="togglePassword('reg_confirm', 'toggleConfirmIcon')">
+                                    <i class="bi bi-eye-slash text-muted" id="toggleConfirmIcon"></i>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Confirm Password</label>
-                        <input type="password" name="confirm_password" id="confirm_password" class="form-control"
-                            required onkeyup="validateForm()">
-                        <div id="matchCheck" class="mt-1 text-danger small d-none">✘ Passwords do not match</div>
+                    <script>
+                        function togglePassword(inputId, iconId) {
+                            const input = document.getElementById(inputId);
+                            const icon = document.getElementById(iconId);
+
+                            if (input.type === "password") {
+                                input.type = "text";
+                                icon.classList.remove("bi-eye-slash");
+                                icon.classList.add("bi-eye");
+                            } else {
+                                input.type = "password";
+                                icon.classList.remove("bi-eye");
+                                icon.classList.add("bi-eye-slash");
+                            }
+                        }
+                    </script>
+
+                    <style>
+                        .cursor-pointer {
+                            cursor: pointer;
+                        }
+                    </style>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label small text-muted" for="terms">I verify that I am a licensed
+                            medical professional.</label>
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="showPassword">
-                        <label class="form-check-label" for="showPassword">Show Password</label>
-                    </div>
-
-                    <div class="d-grid mt-4">
-                        <button type="submit" id="submitBtn" class="btn btn-primary btn-lg fw-bold" disabled>
-                            Complete Registration
-                        </button>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2 rounded-3 fw-bold shadow-sm">Create
+                            Account</button>
                     </div>
                 </form>
 
                 <hr class="my-4">
-                <p class="text-center mb-0">Already registered? <a href="/login"
-                        class="text-primary text-decoration-none fw-bold">Login Here</a></p>
+
+                <div class="text-center">
+                    <span class="text-muted small">Already valid?</span>
+                    <a href="/login" class="text-decoration-none fw-bold ms-1">Login Here</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    const passwordInput = document.getElementById('password');
-    const confirmInput = document.getElementById('confirm_password');
-    const submitBtn = document.getElementById('submitBtn');
-    const matchMsg = document.getElementById('matchCheck');
-    const showPassword = document.getElementById('showPassword');
-    const strengthBar = document.getElementById('strengthBar');
-
-    // Show Password Toggle
-    showPassword.addEventListener('change', function () {
-        const type = this.checked ? 'text' : 'password';
-        passwordInput.type = type;
-        confirmInput.type = type;
-    });
-
-    function validateForm() {
-        const password = passwordInput.value;
-        const confirm = confirmInput.value;
-
-        // 1. Check Strength
-        const requirements = {
-            len: password.length >= 8,
-            upper: /[A-Z]/.test(password),
-            num: /[0-9]/.test(password),
-            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-        };
-
-        let strength = 0;
-        if (requirements.len) strength++;
-        if (requirements.upper) strength++;
-        if (requirements.num) strength++;
-        if (requirements.special) strength++;
-
-        // Update Bar
-        const percentage = (strength / 4) * 100;
-        strengthBar.style.width = percentage + '%';
-
-        if (strength <= 1) strengthBar.className = 'progress-bar bg-danger';
-        else if (strength <= 3) strengthBar.className = 'progress-bar bg-warning';
-        else strengthBar.className = 'progress-bar bg-success';
-
-        // Update Checklist
-        updateIndicator('lenCheck', requirements.len, "Minimum 8 characters");
-        updateIndicator('upperCheck', requirements.upper, "At least one uppercase letter");
-        updateIndicator('numCheck', requirements.num, "At least one number");
-        updateIndicator('specialCheck', requirements.special, "At least one special symbol (!@#$%^&*)");
-
-        // 2. Check Match
-        const isMatch = password === confirm && password.length > 0;
-        if (confirm.length > 0) {
-            matchMsg.classList.remove('d-none');
-            if (isMatch) {
-                matchMsg.innerHTML = "✔ Passwords match";
-                matchMsg.classList.replace('text-danger', 'text-success');
-            } else {
-                matchMsg.innerHTML = "✘ Passwords do not match";
-                matchMsg.classList.replace('text-success', 'text-danger');
-            }
-        } else {
-            matchMsg.classList.add('d-none');
-        }
-
-        // 3. Enable/Disable Button
-        const allReqsMet = Object.values(requirements).every(val => val === true);
-
-        if (allReqsMet && isMatch) {
-            submitBtn.disabled = false;
-        } else {
-            submitBtn.disabled = true;
-        }
-    }
-
-    function updateIndicator(id, isValid, text) {
-        const element = document.getElementById(id);
-        if (isValid) {
-            element.classList.replace('text-danger', 'text-success');
-            element.innerHTML = "✔ " + text;
-        } else {
-            element.classList.replace('text-success', 'text-danger');
-            element.innerHTML = "✘ " + text;
-        }
-    }
-</script>
 {% endblock %}

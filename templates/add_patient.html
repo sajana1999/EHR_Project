@@ -1,43 +1,44 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow border-0 mb-5" style="border-radius: 15px;">
-            <div class="card-header bg-success text-white py-3" style="border-radius: 15px 15px 0 0;">
-                <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add New Patient Record</h4>
+    <div class="col-md-9">
+        <div class="card shadow border-0 mb-5">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i>New Patient Registration</h5>
             </div>
             <div class="card-body p-4">
                 <form action="/add_patient" method="POST" enctype="multipart/form-data">
 
+                    <h6 class="text-primary fw-bold mb-3">Personal Information</h6>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">First Name</label>
-                            <input type="text" name="first_name" class="form-control shadow-sm" placeholder="e.g. John" required>
+                            <label class="form-label text-muted small fw-bold">FIRST NAME</label>
+                            <input type="text" name="first_name" class="form-control" placeholder="e.g. John" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Last Name</label>
-                            <input type="text" name="last_name" class="form-control shadow-sm" placeholder="e.g. Doe" required>
+                            <label class="form-label text-muted small fw-bold">LAST NAME</label>
+                            <input type="text" name="last_name" class="form-control" placeholder="e.g. Doe" required>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Insurance Number</label>
-                            <input type="text" name="insurance_number" class="form-control shadow-sm" required>
+                            <label class="form-label text-muted small fw-bold">INSURANCE ID</label>
+                            <input type="text" name="insurance_number" class="form-control" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Age</label>
-                            <input type="number" name="age" class="form-control shadow-sm" required>
+                            <label class="form-label text-muted small fw-bold">AGE</label>
+                            <input type="number" name="age" class="form-control" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Weight (kg)</label>
-                            <input type="number" step="0.1" name="weight" class="form-control shadow-sm" required>
+                            <label class="form-label text-muted small fw-bold">WEIGHT (KG)</label>
+                            <input type="number" step="0.1" name="weight" class="form-control" required>
                         </div>
                     </div>
 
-                    <div class="row mb-3 align-items-center">
+                    <div class="row mb-4">
                         <div class="col-md-6">
-                            <label class="form-label d-block fw-bold">Gender</label>
+                            <label class="form-label text-muted small fw-bold d-block">GENDER</label>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="gender" value="Male" checked>
                                 <label class="form-check-label">Male</label>
@@ -49,90 +50,68 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label d-block fw-bold">Allergies</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="allergies" value="Yes" id="allergyCheck">
-                                <label class="form-check-label text-muted" for="allergyCheck">Patient has known allergies</label>
+                            <label class="form-label text-muted small fw-bold d-block">ALLERGIES</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="allergies" value="Yes"
+                                    id="allergyCheck">
+                                <label class="form-check-label text-danger" for="allergyCheck">Patient has known
+                                    allergies</label>
                             </div>
                         </div>
                     </div>
 
+                    <h6 class="text-primary fw-bold mb-3 border-top pt-3">Clinical Data</h6>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Next Appointment Date</label>
+                        <label class="form-label text-muted small fw-bold">NEXT APPOINTMENT</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="fas fa-calendar-alt text-success"></i></span>
-                            <input type="text" name="appt_date" id="datepicker" class="form-control bg-white shadow-sm" placeholder="Select Date" required>
+                            <span class="input-group-text bg-white"><i
+                                    class="bi bi-calendar-event text-primary"></i></span>
+                            <input type="text" name="appt_date" id="datepicker" class="form-control"
+                                placeholder="Select Date" required>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Medical History / Notes</label>
-                        <textarea name="history" class="form-control shadow-sm" rows="3" placeholder="Enter previous conditions, surgeries, or current medications..."></textarea>
+                        <label class="form-label text-muted small fw-bold">MEDICAL HISTORY / NOTES</label>
+                        <textarea name="history" class="form-control" rows="3"
+                            placeholder="Enter previous conditions, surgeries, or current medications..."></textarea>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Patient Profile Photo</label>
+                        <label class="form-label text-muted small fw-bold">PROFILE PHOTO</label>
                         <input type="file" name="patient_img" class="form-control" accept="image/*">
-                        <div class="form-text">Optional. Default icon will be used if left blank.</div>
                     </div>
 
-                    <div class="p-3 mb-4 rounded" style="background-color: #f8f9fa; border: 1px dashed #28a745;">
-                        <h5 class="text-success fw-bold mb-3"><i class="fas fa-images me-2"></i>Radiology & Clinical Reports</h5>
-                        <div class="row">
-                            <div class="p-4 mb-4 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
-    <h5 class="text-primary fw-bold mb-3"><i class="fas fa-file-medical me-2"></i>Radiology & Clinical Reports</h5>
-    
-    <div id="document-container">
-        <div class="row doc-row mb-3 border-bottom pb-3">
-            <div class="col-md-6">
-                <label class="form-label small fw-bold">Select File (X-ray/Report)</label>
-                <input type="file" name="medical_docs" class="form-control shadow-sm" accept="image/*,.pdf">
-            </div>
-            <div class="col-md-5">
-                <label class="form-label small fw-bold">Date for THIS document</label>
-                <input type="date" name="doc_dates" class="form-control shadow-sm">
-            </div>
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="button" class="btn btn-outline-danger btn-sm remove-row" style="display:none;">&times;</button>
-            </div>
-        </div>
-    </div>
-
-    <button type="button" id="add-more-docs" class="btn btn-sm btn-primary mt-2">
-        <i class="fas fa-plus me-1"></i> + Add Another Document
-    </button>
-</div>
-
-<script>
-document.getElementById('add-more-docs').addEventListener('click', function() {
-    const container = document.getElementById('document-container');
-    const rows = document.querySelectorAll('.doc-row');
-    const newRow = rows[0].cloneNode(true); // Clone the first row
-    
-    // Clear the inputs so they are empty for the new file
-    newRow.querySelectorAll('input').forEach(input => input.value = '');
-    
-    // Show the "X" remove button on all new rows
-    newRow.querySelector('.remove-row').style.display = 'block';
-    
-    container.appendChild(newRow);
-});
-
-// Logic to remove a row when 'X' is clicked
-document.addEventListener('click', function(e) {
-    if (e.target && e.target.classList.contains('remove-row')) {
-        e.target.closest('.doc-row').remove();
-    }
-});
-</script>
+                    <div class="bg-light p-3 rounded mb-4 border">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-images text-primary me-2"></i>Upload Records & Reports
+                        </h6>
+                        <div id="document-container">
+                            <div class="row doc-row mb-2">
+                                <div class="col-md-6">
+                                    <input type="file" name="medical_docs" class="form-control form-control-sm mb-1"
+                                        accept="image/*,.pdf">
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="date" name="doc_dates" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-row border-0"
+                                        style="display:none;"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                            </div>
                         </div>
+                        <button type="button" id="add-more-docs"
+                            class="btn btn-link text-decoration-none btn-sm p-0 mt-2">
+                            <i class="bi bi-plus-circle me-1"></i> Add Another Document
+                        </button>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg shadow">
-                            <i class="fas fa-save me-2"></i>Save Patient EHR
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="/dashboard" class="btn btn-light text-muted">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+                            <i class="bi bi-check2-circle me-2"></i>Save Patient
                         </button>
-                        <a href="/dashboard" class="btn btn-link text-muted">Cancel and go back</a>
                     </div>
                 </form>
             </div>
@@ -148,6 +127,21 @@ document.addEventListener('click', function(e) {
         altFormat: "F j, Y",
         dateFormat: "Y-m-d",
         minDate: "today"
+    });
+
+    document.getElementById('add-more-docs').addEventListener('click', function () {
+        const container = document.getElementById('document-container');
+        const rows = document.querySelectorAll('.doc-row');
+        const newRow = rows[0].cloneNode(true);
+        newRow.querySelectorAll('input').forEach(input => input.value = '');
+        newRow.querySelector('.remove-row').style.display = 'block';
+        container.appendChild(newRow);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target && (e.target.classList.contains('remove-row') || e.target.closest('.remove-row'))) {
+            e.target.closest('.doc-row').remove();
+        }
     });
 </script>
 {% endblock %}

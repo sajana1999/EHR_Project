@@ -1,31 +1,79 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5 mt-5">
-        <div class="card shadow border-0">
+<div class="row min-vh-100 align-items-center justify-content-center">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-5">
-                <h2 class="text-center mb-4 text-primary fw-bold">Doctor Login</h2>
+                <div class="text-center mb-4">
+                    <i class="bi bi-hospital display-4 text-primary"></i>
+                    <h3 class="fw-bold mt-3">Doctor Login</h3>
+                    <p class="text-muted">Secure Access Portal</p>
+                </div>
 
-                <form action="/login" method="POST">
+                <form method="POST" action="/login">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Username</label>
-                        <input type="text" name="username" class="form-control" required>
+                        <label for="username" class="form-label text-muted small fw-bold">USERNAME</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i
+                                    class="bi bi-person text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 bg-light" id="username"
+                                name="username" required>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Password</label>
-                        <input type="password" name="password" class="form-control" required>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label text-muted small fw-bold">PASSWORD</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i
+                                    class="bi bi-lock text-muted"></i></span>
+                            <input type="password" class="form-control border-start-0 border-end-0 bg-light"
+                                id="password" name="password" required>
+                            <span class="input-group-text bg-light border-start-0 cursor-pointer"
+                                onclick="togglePassword('password', 'toggleIcon')">
+                                <i class="bi bi-eye-slash text-muted" id="toggleIcon"></i>
+                            </span>
+                        </div>
+                        <div class="text-end mt-2">
+                            <a href="/forgot_password" class="text-decoration-none small text-primary">Forgot
+                                Password?</a>
+                        </div>
                     </div>
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg fw-bold">Login</button>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2 rounded-3 fw-bold shadow-sm">Secure
+                            Login</button>
                     </div>
                 </form>
 
-                <div class="text-center mt-4">
-                    <a href="{{ url_for('forgot_password') }}" class="text-muted small">Forgot Password?</a>
-                    <hr>
-                    <p class="mb-0">Need an account? <a href="/register" class="text-decoration-none fw-bold">Register
-                            Now</a></p>
+                <script>
+                    function togglePassword(inputId, iconId) {
+                        const input = document.getElementById(inputId);
+                        const icon = document.getElementById(iconId);
+
+                        if (input.type === "password") {
+                            input.type = "text";
+                            icon.classList.remove("bi-eye-slash");
+                            icon.classList.add("bi-eye");
+                        } else {
+                            input.type = "password";
+                            icon.classList.remove("bi-eye");
+                            icon.classList.add("bi-eye-slash");
+                        }
+                    }
+                </script>
+
+                <style>
+                    .cursor-pointer {
+                        cursor: pointer;
+                    }
+                </style>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <span class="text-muted small">New Provider?</span>
+                    <a href="/register" class="text-decoration-none fw-bold ms-1">Register Account</a>
                 </div>
             </div>
         </div>

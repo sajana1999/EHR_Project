@@ -1,206 +1,203 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-    /* Professional Medical Theme CSS */
-    body { background-color: #f4f7f6; }
-    
-    .card-custom {
-        border-radius: 15px;
-        border: none;
-        overflow: hidden;
-    }
-
-    .table thead {
-        background-color: #f8f9fa;
+    /* Dashboard Specific Styles */
+    .table-custom thead th {
+        border-top: none;
+        border-bottom: 2px solid #e9ecef;
+        color: #6c757d;
+        font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+        padding-bottom: 1rem;
     }
 
-    /* Button Group Styling */
-    .btn-group-custom .btn {
-        padding: 6px 15px;
-        font-weight: 500;
-        transition: all 0.2s ease;
+    .table-custom td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
     }
 
-    .btn-view-custom:hover {
-        background-color: #0d6efd !important;
-        color: white !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
-    }
-
-    .patient-img {
-        width: 45px; 
-        height: 45px; 
-        object-fit: cover; 
-        border: 2px solid #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    /* The Perfect Red Notification Badge */
-    .new-badge {
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        width: 8px;
-        height: 8px;
-        background-color: #ff3b30; /* Medical Red */
+    .patient-avatar {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
         border-radius: 50%;
-        border: 1px solid white;
-        box-shadow: 0 0 4px rgba(255, 59, 48, 0.6);
-        animation: pulse-red 2s infinite;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    @keyframes pulse-red {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
-        70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(255, 59, 48, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+    .action-btn-group .btn {
+        padding: 0.25rem 0.5rem;
     }
 
-    /* This ensures the dot stays inside the ID cell */
-    .id-cell {
-        position: relative;
-        padding-left: 20px !important; /* Space for the dot */
+    /* Mobile Data Cards (Visible on mobile only) */
+    @media (max-width: 768px) {
+        .table-responsive {
+            display: none;
+        }
+
+        .mobile-cards {
+            display: block;
+        }
+    }
+
+    @media (min-width: 769px) {
+        .mobile-cards {
+            display: none;
+        }
     }
 </style>
 
-<div class="container mt-5">
-    <div class="row align-items-center mb-4">
-        <div class="col-md-7">
-            <h1 class="fw-bold text-dark mb-1">Medical Dashboard</h1>
-            <p class="text-muted">Welcome back, <span class="text-primary fw-bold">Dr. {{ session['username'] }}</span></p>
-        </div>
-        <div class="col-md-5 text-end">
-            <a href="/add_patient" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">+ Add New Patient</a>
-            <a href="/logout" class="btn btn-outline-secondary px-4 py-2 rounded-pill ms-2">Logout</a>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark">Patient Dashboard</h2>
+        <p class="text-muted">Overview of all active patient records.</p>
     </div>
-   <div class="row mb-4">
-    <div class="col-md-6">
+    <a href="{{ url_for('add_patient') }}" class="btn btn-primary shadow-sm px-4 py-2">
+        <i class="bi bi-person-plus-fill me-2"></i> Add New Patient
+    </a>
+</div>
+
+<!-- Search Bar -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-2">
         <form action="/dashboard" method="GET" class="d-flex">
-            <div class="input-group shadow-sm">
-                <span class="input-group-text bg-white border-end-0">
-                    <i class="fas fa-search text-muted"></i>
-                </span>
-                <input type="text" name="search" class="form-control border-start-0" 
-                       placeholder="Search name or Insurance ID..." 
-                       value="{{ request.args.get('search', '') }}">
-                <button type="submit" class="btn btn-primary px-4" style="border-radius: 0 8px 8px 0;">Search</button>
-            </div>
+            <span class="input-group-text bg-transparent border-0 ps-3">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" name="search" class="form-control border-0 shadow-none ps-2"
+                placeholder="Search patients by name or insurance ID..." value="{{ request.args.get('search', '') }}">
+            <button type="submit" class="btn btn-primary px-4 rounded-3 m-1">Search</button>
         </form>
     </div>
 </div>
 
-    <div class="card card-custom shadow">
-        <div class="card-header bg-white py-3 border-0">
-            <h5 class="mb-0 fw-bold"><i class="fas fa-user-injured me-2 text-primary"></i>Patient Registry</h5>
-            
-        </div>
-        
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="text-muted">
-                    <tr>
-                        <th class="ps-4">ID</th>
-                        <th>Patient Info</th>
-                        <th>Age/Gender</th>
-                        <th>Insurance ID</th>
-                        <th class="text-end pe-4">Clinical Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for patient in patients %}
-                    <tr>
-                        <td class="id-cell ps-4 text-muted">
-    {% if patient.is_seen == 0 %}
-        <span class="new-badge" title="New Patient"></span>
-    {% endif %}
-    
-    #{{ patient.id }}
-</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <img src="{{ url_for('static', filename=patient.patient_img) }}" 
-                                     class="rounded-circle patient-img me-3">
-                                <div>
-                                    <div class="fw-bold text-dark">{{ patient.first_name }} {{ patient.last_name }}</div>
-                                    <div class="small text-muted">Next Appointment: {{ patient.appt_date }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="fw-semibold">{{ patient.age }} Yrs</div>
-                            <span class="badge bg-light text-dark border-0 fw-normal" style="font-size: 0.75rem;">{{ patient.gender }}</span>
-                        </td>
-                        <td>
-                            <code class="text-primary fw-bold">{{ patient.insurance_number }}</code>
-                        </td>
-                      <td class="text-end pe-4">
-    <div class="d-flex justify-content-end gap-2">
-        <a href="/patient/{{ patient.id }}" class="btn btn-primary btn-sm px-3 shadow-sm">
-            View Record
-        </a>
-
-        <a href="/patient/{{ patient.id }}/radiology" class="btn btn-primary btn-sm px-3 shadow-sm">
-            Reports
-        </a>
-
-        <a href="/edit_patient/{{ patient.id }}" class="btn btn-primary btn-sm px-3 shadow-sm">
-            Edit Record
-        </a>
-
-        <button type="button" onclick="deletePatient('{{ patient.id }}')" class="btn btn-danger btn-sm px-3 shadow-sm">
-            Delete
-        </button>
-    </div>
-</td>  
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="fas fa-folder-open d-block mb-2 fa-2x"></i>
-                            No patients found. Click "Add New Patient" to begin.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+<!-- Desktop Table View -->
+<div class="card border-0 shadow-sm table-responsive">
+    <table class="table table-hover table-custom mb-0 align-middle">
+        <thead class="bg-light">
+            <tr>
+                <th class="ps-4">ID</th>
+                <th>Patient Name</th>
+                <th>Age / Gender</th>
+                <th>Insurance ID</th>
+                <th>Next Appt</th>
+                <th class="text-end pe-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td class="ps-4">
+                    {% if patient.is_seen == 0 %}
+                    <span class="badge bg-danger rounded-circle p-1 me-1" title="New Patient">
+                        <span class="visually-hidden">New</span>
+                    </span>
+                    {% endif %}
+                    <span class="fw-bold text-muted">#{{ patient.id }}</span>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <img src="{{ url_for('static', filename=patient.patient_img) }}" alt="Patient"
+                            class="patient-avatar me-3">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">{{ patient.first_name }} {{ patient.last_name }}</h6>
+                            <small class="text-muted">Updated: Today</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="fw-medium">{{ patient.age }} Yrs</span>
+                    <span class="text-muted small">({{ patient.gender }})</span>
+                </td>
+                <td><code class="text-primary bg-light px-2 py-1 rounded">{{ patient.insurance_number }}</code></td>
+                <td>{{ patient.appt_date }}</td>
+                <td class="text-end pe-4">
+                    <div class="btn-group action-btn-group shadow-sm rounded-3" role="group">
+                        <a href="/patient/{{ patient.id }}" class="btn btn-light border-0" title="View Details">
+                            <i class="bi bi-eye text-primary"></i>
+                        </a>
+                        <a href="/edit_patient/{{ patient.id }}" class="btn btn-light border-0" title="Edit Record">
+                            <i class="bi bi-pencil text-secondary"></i>
+                        </a>
+                        <a href="/patient/{{ patient.id }}/radiology" class="btn btn-light border-0" title="Radiology">
+                            <i class="bi bi-images text-info"></i>
+                        </a>
+                        <button type="button" onclick="deletePatient('{{ patient.id }}')" class="btn btn-light border-0"
+                            title="Delete">
+                            <i class="bi bi-trash text-danger"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="bi bi-folder2-open display-4 d-block mb-3 opacity-25"></i>
+                    No patients found. Get started by adding a new patient.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-<script>
-function confirmDelete(id) {
-    if (confirm("Are you sure you want to delete this patient record? This cannot be undone.")) {
-        window.location.href = "/delete_patient/" + id;
-    }
-}
-</script>
+<!-- Mobile Card View -->
+<div class="mobile-cards">
+    {% for patient in patients %}
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <img src="{{ url_for('static', filename=patient.patient_img) }}" class="patient-avatar me-3">
+                <div>
+                    <h5 class="card-title fw-bold mb-0">{{ patient.first_name }} {{ patient.last_name }}</h5>
+                    <small class="text-muted">#{{ patient.id }} • {{ patient.age }} Yrs • {{ patient.gender }}</small>
+                </div>
+                <div class="ms-auto">
+                    {% if patient.is_seen == 0 %}
+                    <span class="badge bg-danger">New</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Insurance ID</span>
+                    <span class="fw-bold text-dark small">{{ patient.insurance_number }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">Next Appt</span>
+                    <span class="fw-bold text-primary small">{{ patient.appt_date }}</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/patient/{{ patient.id }}" class="btn btn-outline-primary btn-sm flex-grow-1">View</a>
+                <a href="/edit_patient/{{ patient.id }}" class="btn btn-outline-secondary btn-sm flex-grow-1">Edit</a>
+                <button onclick="deletePatient('{{ patient.id }}')" class="btn btn-outline-danger btn-sm"><i
+                        class="bi bi-trash"></i></button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-function deletePatient(patientId) {
-    Swal.fire({
-        title: 'Delete Patient Record?',
-        text: "This will permanently remove all medical history and X-ray files!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Yes, Delete Everything',
-        cancelButtonText: 'No, Keep Record',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // This redirects the browser to the Python delete route
-            window.location.href = "/delete_patient/" + patientId;
-        }
-    })
-}
+    function deletePatient(patientId) {
+        Swal.fire({
+            title: 'Delete Patient Record?',
+            text: "This will permanently remove the patient data.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Delete',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/delete_patient/" + patientId;
+            }
+        })
+    }
 </script>
-
 {% endblock %}
