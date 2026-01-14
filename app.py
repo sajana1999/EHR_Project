@@ -18,7 +18,7 @@ serializer = URLSafeTimedSerializer(app.secret_key)
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'root*', # Ensure this matches your MySQL Workbench password
+    'password': 'KINGsajana*', # Ensure this matches your MySQL Workbench password
     'database': 'ehr_system',
     'cursorclass': pymysql.cursors.DictCursor
 }

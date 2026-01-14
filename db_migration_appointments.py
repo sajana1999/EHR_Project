@@ -3,7 +3,7 @@ import pymysql
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'root*', 
+    'password': 'KINGsajana*', 
     'database': 'ehr_system',
     'cursorclass': pymysql.cursors.DictCursor
 }

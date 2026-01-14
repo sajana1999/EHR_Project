@@ -99,8 +99,15 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center">
-                        <img src="{{ url_for('static', filename=patient.patient_img) }}" alt="Patient"
+                        {% if patient.image_path %}
+                        <img src="{{ url_for('static', filename='uploads/' + patient.image_path) }}" alt="Patient"
                             class="patient-avatar me-3">
+                        {% else %}
+                        <div class="bg-light rounded-circle me-3 d-flex align-items-center justify-content-center border"
+                            style="width: 45px; height: 45px;">
+                            <i class="bi bi-person-fill text-secondary fs-5"></i>
+                        </div>
+                        {% endif %}
                         <div>
                             <h6 class="mb-0 fw-bold text-dark">{{ patient.first_name }} {{ patient.last_name }}</h6>
                             <small class="text-muted">Updated: Today</small>
@@ -150,7 +157,15 @@
     <div class="card border-0 shadow-sm mb-3">
         <div class="card-body">
             <div class="d-flex align-items-center mb-3">
-                <img src="{{ url_for('static', filename=patient.patient_img) }}" class="patient-avatar me-3">
+                {% if patient.image_path %}
+                <img src="{{ url_for('static', filename='uploads/' + patient.image_path) }}"
+                    class="patient-avatar me-3">
+                {% else %}
+                <div class="bg-light rounded-circle me-3 d-flex align-items-center justify-content-center border"
+                    style="width: 45px; height: 45px;">
+                    <i class="bi bi-person-fill text-secondary fs-5"></i>
+                </div>
+                {% endif %}
                 <div>
                     <h5 class="card-title fw-bold mb-0">{{ patient.first_name }} {{ patient.last_name }}</h5>
                     <small class="text-muted">#{{ patient.id }} • {{ patient.age }} Yrs • {{ patient.gender }}</small>

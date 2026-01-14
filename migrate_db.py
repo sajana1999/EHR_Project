@@ -4,7 +4,7 @@ import pymysql
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'root*', # Ensure this matches your MySQL password
+    'password': 'KINGsajana*', # Ensure this matches your MySQL password
     'database': 'ehr_system'
 }
 
