@@ -82,7 +82,7 @@
                 <th>Patient Name</th>
                 <th>Age / Gender</th>
                 <th>Insurance ID</th>
-                <th>Next Appt</th>
+                <th>Status</th>
                 <th class="text-end pe-4">Actions</th>
             </tr>
         </thead>
@@ -119,7 +119,13 @@
                     <span class="text-muted small">({{ patient.gender }})</span>
                 </td>
                 <td><code class="text-primary bg-light px-2 py-1 rounded">{{ patient.insurance_number }}</code></td>
-                <td>{{ patient.appt_date }}</td>
+                <td>
+                    {% if patient.is_active %}
+                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Active</span>
+                    {% else %}
+                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Inactive</span>
+                    {% endif %}
+                </td>
                 <td class="text-end pe-4">
                     <div class="btn-group action-btn-group shadow-sm rounded-3" role="group">
                         <a href="/patient_details/{{ patient.id }}" class="btn btn-light border-0" title="View Details">
@@ -214,6 +220,14 @@
                 window.location.href = "/delete_patient/" + patientId;
             }
         })
+    })
     }
+
+    // Fix for stale data when navigating back (bfcache)
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
 </script>
 {% endblock %}

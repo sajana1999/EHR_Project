@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
@@ -41,6 +41,17 @@ def get_db_connection():
     return pymysql.connect(**db_config)
 
 # --- DOCTOR ROUTES (Auth & Verification) ---
+
+@app.after_request
+def add_header(response):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.route('/')
 def index():
@@ -409,6 +420,29 @@ def update_patient(id):
     db.close()
     flash("Patient updated successfully!", "success")
     return redirect(url_for('dashboard'))
+
+@app.route('/toggle_status/<int:id>', methods=['POST'])
+def toggle_status(id):
+    if 'logged_in' not in session: return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    db = get_db_connection()
+    cur = db.cursor()
+    
+    # Check ownership
+    cur.execute("SELECT id, is_active FROM patients WHERE id = %s AND doctor_id = %s", (id, session['doctor_id']))
+    patient = cur.fetchone()
+    
+    if not patient:
+        db.close()
+        return jsonify({'success': False, 'message': 'Patient not found'}), 404
+    
+    # Toggle status
+    new_status = 0 if patient['is_active'] else 1
+    cur.execute("UPDATE patients SET is_active = %s WHERE id = %s", (new_status, id))
+    db.commit()
+    db.close()
+    
+    return jsonify({'success': True, 'new_status': new_status})
 
 @app.route('/patient/<int:id>/radiology')
 def radiology_gallery(id):
