@@ -62,14 +62,26 @@ def home():
     cur.execute("SELECT gender, COUNT(*) as count FROM patients WHERE doctor_id = %s GROUP BY gender", (session['doctor_id'],))
     gender_stats = cur.fetchall()
 
-    # Today's Appointments
+    # Today's Appointments (JOINED)
     today = datetime.now().date()
-    cur.execute("SELECT first_name, last_name, id, image_path FROM patients WHERE doctor_id = %s AND appointment_date = %s", (session['doctor_id'], today))
+    query_today = """
+        SELECT p.first_name, p.last_name, p.id, p.image_path, a.appointment_date 
+        FROM patients p 
+        JOIN appointments a ON p.id = a.patient_id 
+        WHERE p.doctor_id = %s AND a.appointment_date = %s
+    """
+    cur.execute(query_today, (session['doctor_id'], today))
     today_appts = cur.fetchall()
 
-    # Tomorrow's Appointments
+    # Tomorrow's Appointments (JOINED)
     tomorrow = today + timedelta(days=1)
-    cur.execute("SELECT first_name, last_name, id, image_path FROM patients WHERE doctor_id = %s AND appointment_date = %s", (session['doctor_id'], tomorrow))
+    query_tomorrow = """
+        SELECT p.first_name, p.last_name, p.id, p.image_path, a.appointment_date 
+        FROM patients p 
+        JOIN appointments a ON p.id = a.patient_id 
+        WHERE p.doctor_id = %s AND a.appointment_date = %s
+    """
+    cur.execute(query_tomorrow, (session['doctor_id'], tomorrow))
     tomorrow_appts = cur.fetchall()
     
     db.close()
@@ -187,7 +199,133 @@ def patient_details(id):
         
     return render_template('patient_details.html', patient=patient)
 
-@app.route('/edit_patient/<int:id>')
+@app.route('/patient_details/<int:id>')
+def patient_profile_view(id):
+    if 'logged_in' not in session: return redirect(url_for('login'))
+    
+    db = get_db_connection()
+    cur = db.cursor()
+    
+    # 1. Fetch Basic Patient Info
+    cur.execute("SELECT * FROM patients WHERE id = %s AND doctor_id = %s", (id, session['doctor_id']))
+    patient = cur.fetchone()
+    
+    if not patient:
+        db.close()
+        flash("Patient not found.", "danger")
+        return redirect(url_for('dashboard'))
+
+    # 2. Fetch Attached Documents (for downloads)
+    cur.execute("SELECT * FROM documents WHERE patient_id = %s ORDER BY created_at DESC", (id,))
+    documents = cur.fetchall()
+
+    # 3. Fetch Appointment History
+    cur.execute("SELECT * FROM appointments WHERE patient_id = %s AND doctor_id = %s ORDER BY appointment_date DESC", (id, session['doctor_id']))
+    history = cur.fetchall()
+    
+    # 4. Map Documents to Visits (by Date) - Basic Strategy
+    # Iterate history and find docs with matching date
+    for visit in history:
+        visit['documents'] = []
+        if visit['appointment_date']:
+            # Depending on type (date vs string), ensure comparison works.
+            # PyMySQL returns date object.
+            v_date = visit['appointment_date']
+            for doc in documents:
+                if doc['document_date'] == v_date:
+                    visit['documents'].append(doc)
+    
+    db.close()
+    
+    return render_template('patient_details.html', patient=patient, history=history)
+
+@app.route('/appointments', methods=['GET', 'POST'])
+def appointments():
+    if 'logged_in' not in session: return redirect(url_for('login'))
+    
+    db = get_db_connection()
+    cur = db.cursor()
+    
+    # POST: Add New Visit
+    if request.method == 'POST':
+        patient_id = request.form.get('patient_id')
+        appt_date = request.form.get('appointment_date')
+        
+        # Insert Appointment
+        query = """INSERT INTO appointments (patient_id, doctor_id, appointment_date, weight, diagnosis, clinical_notes, prescription) 
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+        cur.execute(query, (
+            patient_id,
+            session['doctor_id'],
+            appt_date,
+            request.form.get('weight') or None,
+            request.form.get('diagnosis'),
+            request.form.get('clinical_notes'),
+            request.form.get('prescription')
+        ))
+        
+        # Handle Documents (Linked to this date)
+        files = request.files.getlist('medical_docs')
+        if files:
+            for f in files:
+                if f and f.filename:
+                    fname = secure_filename(f.filename)
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))
+                    
+                    # Link to visit Date (Requirement)
+                    doc_query = """INSERT INTO documents (patient_id, doctor_id, file_path, document_date) 
+                                   VALUES (%s, %s, %s, %s)"""
+                    cur.execute(doc_query, (patient_id, session['doctor_id'], fname, appt_date))
+
+        db.commit()
+        db.close()
+        flash("Clinical appointment recorded successfully.", "success")
+        return redirect(url_for('patient_profile_view', id=patient_id))
+
+    # GET: Search & Form
+    search_query = request.args.get('search')
+    selected_patient_id = request.args.get('patient_id')
+    patients = []
+    selected_patient = None
+    
+    if search_query:
+        # Search logic
+        q_str = f"%{search_query}%"
+        cur.execute("SELECT * FROM patients WHERE doctor_id = %s AND (first_name LIKE %s OR last_name LIKE %s OR insurance_number LIKE %s)", 
+                   (session['doctor_id'], q_str, q_str, q_str))
+        patients = cur.fetchall()
+        
+    if selected_patient_id:
+        cur.execute("SELECT * FROM patients WHERE id = %s AND doctor_id = %s", (selected_patient_id, session['doctor_id']))
+        selected_patient = cur.fetchone()
+        
+    db.close()
+    return render_template('appointments.html', patients=patients, selected_patient=selected_patient)
+
+@app.route('/delete_appointment/<int:id>')
+def delete_appointment(id):
+    if 'logged_in' not in session: return redirect(url_for('login'))
+    
+    db = get_db_connection()
+    cur = db.cursor()
+    
+    # Verify ownership before deleting
+    cur.execute("SELECT patient_id FROM appointments WHERE id = %s AND doctor_id = %s", (id, session['doctor_id']))
+    appt = cur.fetchone()
+    
+    if appt:
+        cur.execute("DELETE FROM appointments WHERE id = %s", (id,))
+        # Also delete linked documents? User didn't specify, but usually good.
+        # But documents table links to patient_id + document_date, not appointment_id directly.
+        # So we leave them or delete manually. I'll leave them to avoid accidental data loss.
+        db.commit()
+        flash("Visit deleted.", "warning")
+        return redirect(url_for('patient_profile_view', id=appt['patient_id']))
+    
+    db.close()
+    flash("Appointment not found or access denied.", "danger")
+    return redirect(url_for('dashboard'))
+@app.route('/edit_patient/<int:id>', methods=['GET'])
 def edit_patient(id):
     if 'logged_in' not in session: return redirect(url_for('login'))
     db = get_db_connection()
@@ -225,16 +363,20 @@ def update_patient(id):
     
     # 1. Update Basic Info
     update_query = """UPDATE patients SET 
-                      first_name=%s, last_name=%s, insurance_number=%s, age=%s, weight=%s, 
-                      gender=%s, appointment_date=%s, has_allergies=%s, medical_history=%s 
+                      first_name=%s, last_name=%s, insurance_number=%s, age=%s, 
+                      gender=%s, has_allergies=%s, created_at=%s 
                       WHERE id=%s"""
+    
+    # Handle created_at override if provided, else keep existing?
+    # Usually we don't update Registration Date unless necessary. 
+    # But user asked for "editing of... Registration Date".
+    # Ensure form sends `created_at`.
     
     cur.execute(update_query, (
         request.form.get('first_name'), request.form.get('last_name'), request.form.get('insurance_number'),
-        request.form.get('age'), request.form.get('weight'), request.form.get('gender'),
-        request.form.get('appt_date') or None,
+        request.form.get('age'), request.form.get('gender'),
         'Yes' if request.form.get('allergies') else 'No',
-        request.form.get('history'),
+        request.form.get('created_at'),
         id
     ))
     
@@ -368,46 +510,50 @@ def add_patient():
         db = get_db_connection()
         cur = db.cursor()
         
-        # 2. Insert Patient Data (Including new age/weight columns)
-        query = """INSERT INTO patients (doctor_id, first_name, last_name, insurance_number, 
-                   gender, age, weight, has_allergies, medical_history, appointment_date, image_path, is_seen) 
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"""
+        # 2. Insert Patient Data (Static Demographics ONLY)
+        # Registration Date (created_at) is handled by DB default or passed if manual date needed?
+        # Form has 'created_at'. Let's use it if populated, else DB default. 
+        # But DB schema: created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
+        # If I want to override, I should include it in INSERT.
+        # Field name in form: created_at
         
-        cur.execute(query, (
-            session['doctor_id'], 
-            request.form.get('first_name'), 
-            request.form.get('last_name'),
-            request.form.get('insurance_number'), 
-            request.form.get('gender'),
-            request.form.get('age'),            # New Field
-            request.form.get('weight'),         # New Field
-            'Yes' if request.form.get('allergies') else 'No', 
-            request.form.get('history'), 
-            request.form.get('appt_date') or None, 
-            filename
-        ))
-        patient_id = cur.lastrowid # Get the ID of the new patient
+        reg_date = request.form.get('created_at')
         
-        # 3. Handle Medical Document Uploads (Multiple)
-        files = request.files.getlist('medical_docs')
-        doc_dates = request.form.getlist('doc_dates')
-        
-        if files:
-            for idx, f in enumerate(files):
-                if f and f.filename:
-                    fname = secure_filename(f.filename)
-                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))
-                    
-                    # Try to get corresponding date, else default to today
-                    d_date = doc_dates[idx] if idx < len(doc_dates) and doc_dates[idx] else None
-                    
-                    doc_query = """INSERT INTO documents (patient_id, doctor_id, file_path, document_date) 
-                                   VALUES (%s, %s, %s, %s)"""
-                    cur.execute(doc_query, (patient_id, session['doctor_id'], fname, d_date))
-
+        if reg_date:
+            query = """INSERT INTO patients (doctor_id, first_name, last_name, insurance_number, 
+                       gender, age, has_allergies, image_path, created_at, is_seen) 
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"""
+            params = (
+                session['doctor_id'], 
+                request.form.get('first_name'), 
+                request.form.get('last_name'),
+                request.form.get('insurance_number'), 
+                request.form.get('gender'),
+                request.form.get('age'),
+                'Yes' if request.form.get('allergies') else 'No', 
+                filename,
+                reg_date
+            )
+        else:
+            query = """INSERT INTO patients (doctor_id, first_name, last_name, insurance_number, 
+                       gender, age, has_allergies, image_path, is_seen) 
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 0)"""
+            params = (
+                session['doctor_id'], 
+                request.form.get('first_name'), 
+                request.form.get('last_name'),
+                request.form.get('insurance_number'), 
+                request.form.get('gender'),
+                request.form.get('age'),
+                'Yes' if request.form.get('allergies') else 'No', 
+                filename
+            )
+            
+        cur.execute(query, params)
         db.commit()
         db.close()
-        flash("Patient added successfully!", "success")
+        
+        flash("Patient registered successfully! You can now add an appointment.", "success")
         return redirect(url_for('dashboard'))
     return render_template('add_patient.html')
 

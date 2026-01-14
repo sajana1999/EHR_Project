@@ -12,6 +12,24 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f8f9fa;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("{{ url_for('static', filename='images/medical_bg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .sidebar {
@@ -64,16 +82,18 @@
 </head>
 
 <body class="d-flex">
+    {% block sidebar %}
     <nav class="sidebar d-flex flex-column p-3">
         <h4 class="text-center mb-4"><i class="bi bi-shield-plus"></i> EHR System</h4>
         <ul class="nav nav-pills flex-column mb-auto">
             <li><a href="{{ url_for('home') }}" class="nav-link"><i class="bi bi-house"></i> Home</a></li>
-            <li><a href="{{ url_for('about') }}" class="nav-link"><i class="bi bi-info-circle"></i> About Us</a></li>
             {% if session.logged_in %}
             <li><a href="{{ url_for('dashboard') }}" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             </li>
             <li><a href="{{ url_for('add_patient') }}" class="nav-link"><i class="bi bi-person-plus"></i> Add
                     Patient</a></li>
+            <li><a href="{{ url_for('appointments') }}" class="nav-link"><i class="bi bi-calendar-check"></i>
+                    Appointments</a></li>
             <li class="mt-4"><a href="{{ url_for('logout') }}" class="nav-link text-danger"><i
                         class="bi bi-box-arrow-left"></i> Logout</a></li>
             {% else %}
@@ -81,8 +101,10 @@
             {% endif %}
         </ul>
         <hr>
+        <a href="{{ url_for('about') }}" class="nav-link"><i class="bi bi-info-circle"></i> About Us</a>
         <div class="text-center small opacity-50">&copy; 2026 EHR Medical</div>
     </nav>
+    {% endblock %}
 
     <div class="main-content">
         <header class="bg-white p-3 shadow-sm mb-4">

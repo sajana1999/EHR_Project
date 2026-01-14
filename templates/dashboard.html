@@ -115,10 +115,11 @@
                 <td>{{ patient.appt_date }}</td>
                 <td class="text-end pe-4">
                     <div class="btn-group action-btn-group shadow-sm rounded-3" role="group">
-                        <a href="/patient/{{ patient.id }}" class="btn btn-light border-0" title="View Details">
-                            <i class="bi bi-eye text-primary"></i>
+                        <a href="/patient_details/{{ patient.id }}" class="btn btn-light border-0" title="View Details">
+                            <i class="bi bi-eye-fill text-primary"></i>
                         </a>
-                        <a href="/edit_patient/{{ patient.id }}" class="btn btn-light border-0" title="Edit Record">
+                        <a href="/edit_patient/{{ patient.id }}" class="btn btn-light border-0"
+                            title="Edit Demographics">
                             <i class="bi bi-pencil text-secondary"></i>
                         </a>
                         <a href="/patient/{{ patient.id }}/radiology" class="btn btn-light border-0" title="Radiology">

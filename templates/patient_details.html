@@ -1,142 +1,122 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-4 mb-5">
-    <div class="d-print-none mb-4 d-flex justify-content-between">
-        <a href="/dashboard" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Dashboard</a>
-        <button onclick="window.print()" class="btn btn-primary shadow-sm bg-gradient">
-            <i class="bi bi-printer me-2"></i> Print Record
-        </button>
+<div class="container-fluid px-4 mt-4">
+    <!-- Top Section: Patient Profile -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <img src="{{ url_for('static', filename=patient.image_path) if patient.image_path else 'https://via.placeholder.com/150' }}"
+                        class="rounded-circle border border-3 border-white shadow-sm"
+                        style="width: 100px; height: 100px; object-fit: cover;">
+                </div>
+                <div class="col">
+                    <div class="d-flex align-items-center gap-3">
+                        <h2 class="fw-bold mb-0 text-dark">{{ patient.first_name }} {{ patient.last_name }}</h2>
+                        <span class="badge bg-secondary">ID: {{ patient.id }}</span>
+                    </div>
+                    <div class="text-muted mt-1">
+                        <span class="me-3"><i class="bi bi-cake me-1"></i>{{ patient.age }} Years</span>
+                        <span class="me-3"><i class="bi bi-person me-1"></i>{{ patient.gender }}</span>
+                        <span><i class="bi bi-shield-check me-1"></i>{{ patient.insurance_number }}</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="/edit_patient/{{ patient.id }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-pencil me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="card shadow border-0 mx-auto" style="max-width: 850px;" id="printableArea">
-        <div class="card-body p-5">
+    <div class="row g-4">
 
-            <!-- Header -->
-            <div class="row border-bottom pb-4 mb-4 align-items-center">
-                <div class="col-8">
-                    <h2 class="text-uppercase fw-bold text-primary mb-0">Medical Record</h2>
-                    <p class="text-muted small mb-0 spacing-1">CONFIDENTIAL PATIENT DATA</p>
-                </div>
-                <div class="col-4 text-end">
-                    <div class="bg-light p-2 rounded">
-                        <small class="d-block fw-bold text-dark">DR. {{ session['username']|upper }}</small>
-                        <small class="text-muted">{{ patient.created_at }}</small>
+
+        <!-- Bottom Section: Visit Timeline -->
+        <div class="col-12">
+            <h5 class="fw-bold text-dark mb-3 ps-1">Visit Timeline</h5>
+
+            {% if history %}
+            <div class="timeline-container">
+                {% for visit in history %}
+                <div class="card border-0 shadow-sm mb-3">
+                    <div
+                        class="card-header bg-white border-bottom-0 py-3 d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="fw-bold text-primary mb-1">{{ visit.appointment_date }}</h5>
+                            <span class="badge bg-light text-dark border">
+                                {% if visit.weight %}{{ visit.weight }} kg{% else %}Weight not recorded{% endif %}
+                            </span>
+                        </div>
+                        <button onclick="confirmDelete('{{ visit.id }}')" class="btn btn-sm btn-outline-danger border-0"
+                            title="Delete Visit">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="small fw-bold text-muted">DIAGNOSIS</label>
+                                <div class="fw-medium text-dark">{{ visit.diagnosis or 'N/A' }}</div>
+                            </div>
+                            <div class="col-md-7">
+                                <label class="small fw-bold text-muted">DOCTOR'S NOTES</label>
+                                <p class="small text-secondary mb-0" style="white-space: pre-line;">{{
+                                    visit.clinical_notes or 'None' }}</p>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="small fw-bold text-muted">PRESCRIPTION</label>
+                                <div class="p-2 bg-light rounded small text-secondary fst-italic">{{ visit.prescription
+                                    or 'None' }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Linked Documents -->
+                        {% if visit.documents %}
+                        <div class="mt-3 pt-2 border-top">
+                            <small class="fw-bold text-muted"><i class="bi bi-paperclip me-1"></i>ATTACHMENTS</small>
+                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                {% for doc in visit.documents %}
+                                <a href="/download_report/{{ doc.id }}" class="btn btn-sm btn-light border">
+                                    <i class="bi bi-file-earmark-text me-1"></i>Report
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
+                {% endfor %}
             </div>
-
-            <!-- Patient Header Info -->
-            <div class="row mb-5">
-                <div class="col-md-3 text-center">
-                    <img src="{{ url_for('static', filename=patient.patient_img) }}"
-                        class="img-thumbnail rounded-circle shadow-sm"
-                        style="width: 140px; height: 140px; object-fit: cover;">
-                </div>
-
-                <div class="col-md-9 pt-2">
-                    <h3 class="fw-bold text-dark mb-1">{{ patient.first_name }} {{ patient.last_name }}</h3>
-                    <div class="row g-3 mt-1">
-                        <div class="col-4">
-                            <label class="small text-muted fw-bold d-block">ID</label>
-                            <span class="fw-medium">#{{ patient.id }}</span>
-                        </div>
-                        <div class="col-4">
-                            <label class="small text-muted fw-bold d-block">AGE / GENDER</label>
-                            <span>{{ patient.age }} yrs / {{ patient.gender }}</span>
-                        </div>
-                        <div class="col-4">
-                            <label class="small text-muted fw-bold d-block">WEIGHT</label>
-                            <span>{{ patient.weight }} kg</span>
-                        </div>
-                        <div class="col-6">
-                            <label class="small text-muted fw-bold d-block">INSURANCE ID</label>
-                            <span class="font-monospace bg-light px-2 py-1 rounded">{{ patient.insurance_number
-                                }}</span>
-                        </div>
-                    </div>
-                </div>
+            {% else %}
+            <div class="text-center py-5 text-muted bg-light rounded border border-dashed">
+                <i class="bi bi-calendar-event display-4 opacity-25 mb-3 d-block"></i>
+                No appointment history found.
             </div>
-
-            <div class="alert alert-light border-start border-4 border-primary shadow-sm">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label class="small text-primary fw-bold mb-1">ALLERGIES</label>
-                        <p
-                            class="mb-0 {% if patient.allergies == 'Yes' %}text-danger fw-bold{% else %}text-muted{% endif %}">
-                            {% if patient.allergies == 'Yes' %}
-                            <i class="bi bi-exclamation-triangle-fill me-1"></i> DETECTED
-                            {% else %}
-                            None Reported
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="small text-primary fw-bold mb-1">NEXT APPOINTMENT</label>
-                        <p class="mb-0 fw-bold">{{ patient.appt_date }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <h6 class="fw-bold bg-light p-2 border-bottom">CLINICAL NOTES & HISTORY</h6>
-                <div class="p-3">
-                    <p class="card-text text-secondary" style="white-space: pre-line;">{{ patient.medical_history or 'No
-                        detailed history recorded.' }}</p>
-                </div>
-            </div>
-
-            <div class="mt-5 pt-5 text-center">
-                <div class="d-inline-block border-top border-dark pt-2 px-5">
-                    <p class="mb-0 fw-bold signature-font">Dr. {{ session['username'] }}</p>
-                    <small class="text-muted">Physician Signature</small>
-                </div>
-                <p class="mt-4 small text-muted text-center" style="font-size: 0.7rem;">
-                    This document contains confidential health information protected by HIPAA.
-                    Any unauthorized disclosure is prohibited.
-                </p>
-            </div>
-
+            {% endif %}
         </div>
     </div>
 </div>
 
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
-
-    .signature-font {
-        font-family: 'Dancing Script', cursive;
-        font-size: 1.5rem;
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Delete Confirmation
+    function confirmDelete(visitId) {
+        Swal.fire({
+            title: 'Delete this visit?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, delete it',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/delete_appointment/" + visitId;
+            }
+        });
     }
-
-    @media print {
-        body {
-            background: white !important;
-        }
-
-        .sidebar,
-        .navbar,
-        .d-print-none {
-            display: none !important;
-        }
-
-        .main-content {
-            margin: 0 !important;
-            width: 100% !important;
-        }
-
-        .card {
-            border: none !important;
-            box-shadow: none !important;
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-
-        .container {
-            padding: 0 !important;
-            margin: 0 !important;
-            max-width: 100% !important;
-        }
-    }
-</style>
+</script>
 {% endblock %}

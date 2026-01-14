@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark">Manage Appointments</h2>
+            <h5 class="text-muted">Patient: {{ patient.first_name }} {{ patient.last_name }}</h5>
+        </div>
+        <a href="/dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Option A: New Visit -->
+        <div class="col-md-6">
+            <div class="card h-100 border-primary shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle-fill me-2"></i>New Visit</h5>
+                </div>
+                <div class="card-body text-center d-flex flex-column justify-content-center p-5">
+                    <p class="lead text-muted mb-4">Start a new consultation entry for today.</p>
+                    <a href="/add_appointment/{{ patient.id }}"
+                        class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow">
+                        <i class="bi bi-calendar-plus me-2"></i>Add New Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option B: Correct Error (History List) -->
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0 fw-bold text-secondary"><i class="bi bi-pencil-square me-2"></i>Edit Past
+                        Appointment</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% if appointments %}
+                        {% for appt in appointments %}
+                        <a href="/edit_appointment/{{ appt.id }}" class="list-group-item list-group-item-action py-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-primary">{{ appt.appointment_date }}</h6>
+                                    <small class="text-muted">{{ appt.diagnosis or 'No diagnosis' }}</small>
+                                </div>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </div>
+                        </a>
+                        {% endfor %}
+                        {% else %}
+                        <div class="p-5 text-center text-muted">
+                            <i class="bi bi-calendar-x display-4 mb-3 d-block opacity-25"></i>
+                            No past appointments found.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

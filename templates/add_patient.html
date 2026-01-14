@@ -1,147 +1,98 @@
 {% extends "layout.html" %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-9">
-        <div class="card shadow border-0 mb-5">
-            <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i>New Patient Registration</h5>
-            </div>
-            <div class="card-body p-4">
-                <form action="/add_patient" method="POST" enctype="multipart/form-data">
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h4 class="mb-0 fw-bold text-primary"><i class="bi bi-person-vcard me-2"></i>Patient Registration
+                    </h4>
+                    <p class="text-muted small mb-0">Enter static demographic information. Clinical data is added in
+                        Appointments.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
 
-                    <h6 class="text-primary fw-bold mb-3">Personal Information</h6>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small fw-bold">FIRST NAME</label>
-                            <input type="text" name="first_name" class="form-control" placeholder="e.g. John" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small fw-bold">LAST NAME</label>
-                            <input type="text" name="last_name" class="form-control" placeholder="e.g. Doe" required>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold">INSURANCE ID</label>
-                            <input type="text" name="insurance_number" class="form-control" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold">AGE</label>
-                            <input type="number" name="age" class="form-control" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold">WEIGHT (KG)</label>
-                            <input type="number" step="0.1" name="weight" class="form-control" required>
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small fw-bold d-block">GENDER</label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="gender" value="Male" checked>
-                                <label class="form-check-label">Male</label>
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-center">
+                                <div class="mb-2">
+                                    <img id="preview" src="https://via.placeholder.com/150"
+                                        class="img-thumbnail rounded-circle"
+                                        style="width: 150px; height: 150px; object-fit: cover;">
+                                </div>
+                                <label class="btn btn-sm btn-outline-primary w-100">
+                                    <i class="bi bi-camera me-1"></i> Upload Photo
+                                    <input type="file" name="patient_img" class="d-none" onchange="previewImage(event)">
+                                </label>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="gender" value="Female">
-                                <label class="form-check-label">Female</label>
+
+                            <div class="col-md-9">
+                                <h6 class="fw-bold text-muted border-bottom pb-2 mb-3">Personal Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-secondary">FIRST NAME</label>
+                                        <input type="text" name="first_name" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-secondary">LAST NAME</label>
+                                        <input type="text" name="last_name" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-secondary">AGE</label>
+                                        <input type="number" name="age" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-secondary">GENDER</label>
+                                        <select name="gender" class="form-select">
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-secondary">INSURANCE ID</label>
+                                        <input type="text" name="insurance_number" class="form-control"
+                                            placeholder="ABC-12345">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label small fw-bold text-secondary">REGISTRATION DATE</label>
+                                        <input type="date" name="created_at" id="reg_date" class="form-control">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small fw-bold d-block">ALLERGIES</label>
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-muted border-bottom pb-2 mb-3">Additional Details</h6>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="allergies" value="Yes"
-                                    id="allergyCheck">
-                                <label class="form-check-label text-danger" for="allergyCheck">Patient has known
-                                    allergies</label>
+                                <input class="form-check-input" type="checkbox" name="allergies" id="allergyCheck">
+                                <label class="form-check-label ms-2 fw-bold text-dark" for="allergyCheck">Patient
+                                    reports known allergies</label>
                             </div>
                         </div>
-                    </div>
 
-                    <h6 class="text-primary fw-bold mb-3 border-top pt-3">Clinical Data</h6>
-
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">NEXT APPOINTMENT</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i
-                                    class="bi bi-calendar-event text-primary"></i></span>
-                            <input type="text" name="appt_date" id="datepicker" class="form-control"
-                                placeholder="Select Date" required>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/dashboard" class="btn btn-light text-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">Register Patient</button>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">MEDICAL HISTORY / NOTES</label>
-                        <textarea name="history" class="form-control" rows="3"
-                            placeholder="Enter previous conditions, surgeries, or current medications..."></textarea>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label text-muted small fw-bold">PROFILE PHOTO</label>
-                        <input type="file" name="patient_img" class="form-control" accept="image/*">
-                    </div>
-
-                    <div class="bg-light p-3 rounded mb-4 border">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-images text-primary me-2"></i>Upload Records & Reports
-                        </h6>
-                        <div id="document-container">
-                            <div class="row doc-row mb-2">
-                                <div class="col-md-6">
-                                    <input type="file" name="medical_docs" class="form-control form-control-sm mb-1"
-                                        accept="image/*,.pdf">
-                                </div>
-                                <div class="col-md-5">
-                                    <input type="date" name="doc_dates" class="form-control form-control-sm">
-                                </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-outline-danger btn-sm remove-row border-0"
-                                        style="display:none;"><i class="bi bi-x-lg"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" id="add-more-docs"
-                            class="btn btn-link text-decoration-none btn-sm p-0 mt-2">
-                            <i class="bi bi-plus-circle me-1"></i> Add Another Document
-                        </button>
-                    </div>
-
-                    <div class="d-flex gap-2 justify-content-end">
-                        <a href="/dashboard" class="btn btn-light text-muted">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
-                            <i class="bi bi-check2-circle me-2"></i>Save Patient
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    flatpickr("#datepicker", {
-        altInput: true,
-        altFormat: "F j, Y",
-        dateFormat: "Y-m-d",
-        minDate: "today"
-    });
-
-    document.getElementById('add-more-docs').addEventListener('click', function () {
-        const container = document.getElementById('document-container');
-        const rows = document.querySelectorAll('.doc-row');
-        const newRow = rows[0].cloneNode(true);
-        newRow.querySelectorAll('input').forEach(input => input.value = '');
-        newRow.querySelector('.remove-row').style.display = 'block';
-        container.appendChild(newRow);
-    });
-
-    document.addEventListener('click', function (e) {
-        if (e.target && (e.target.classList.contains('remove-row') || e.target.closest('.remove-row'))) {
-            e.target.closest('.doc-row').remove();
-        }
-    });
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var output = document.getElementById('preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+    // Set default date to today
+    document.getElementById('reg_date').valueAsDate = new Date();
 </script>
 {% endblock %}

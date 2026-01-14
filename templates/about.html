@@ -1,50 +1,128 @@
 {% extends "layout.html" %}
+
 {% block content %}
-<div class="row mb-5">
+<div class="row mb-5 align-items-center">
     <div class="col-lg-8 mx-auto text-center">
-        <h1 class="display-4 fw-bold text-dark">About Our EHR Platform</h1>
-        <p class="lead text-muted">A comprehensive solution for modern clinical management and patient care.</p>
+        <span class="badge bg-primary bg-opacity-10 text-primary mb-2 px-3 py-2 rounded-pill fw-bold">Version
+            1.0.0</span>
+        <h1 class="display-4 fw-bold text-dark mt-2">Clinical Precision. Digital Ease.</h1>
+        <p class="lead text-muted mt-3">
+            A specialized Electronic Health Record (EHR) system engineered to streamline patient encounters,
+            visualize medical history, and secure sensitive clinical data.
+        </p>
     </div>
 </div>
 
 <div class="row g-4 mb-5">
     <div class="col-md-4">
-        <div class="card h-100 p-4 text-center">
-            <i class="bi bi-shield-check display-4 text-primary mb-3"></i>
-            <h5>Secure Data Access</h5>
-            <p class="small text-muted">Bank-grade encryption for all medical records and hashed doctor credentials.</p>
+        <div class="card h-100 border-0 shadow-sm p-3">
+            <div class="card-body">
+                <div class="bg-primary bg-opacity-10 d-inline-block p-3 rounded-circle mb-3">
+                    <i class="bi bi-graph-up-arrow text-primary fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Longitudinal Tracking</h5>
+                <p class="text-muted small">
+                    Move beyond static records. Track patient vitals, weight trends, and medical history over multiple
+                    appointments with interactive visual analytics.
+                </p>
+            </div>
         </div>
     </div>
+
     <div class="col-md-4">
-        <div class="card h-100 p-4 text-center">
-            <i class="bi bi-images display-4 text-primary mb-3"></i>
-            <h5>Radiology Support</h5>
-            <p class="small text-muted">Integrated multimedia handling for patient X-rays and imaging documents.</p>
+        <div class="card h-100 border-0 shadow-sm p-3">
+            <div class="card-body">
+                <div class="bg-success bg-opacity-10 d-inline-block p-3 rounded-circle mb-3">
+                    <i class="bi bi-file-earmark-medical text-success fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Digital Document Archive</h5>
+                <p class="text-muted small">
+                    Integrated radiology and report management. Securely associate X-rays, lab results, and PDFs with
+                    specific clinical encounters.
+                </p>
+            </div>
         </div>
     </div>
+
     <div class="col-md-4">
-        <div class="card h-100 p-4 text-center">
-            <i class="bi bi-envelope-check display-4 text-primary mb-3"></i>
-            <h5>Verified Workflows</h5>
-            <p class="small text-muted">Mandatory email verification and secure password recovery protocols.</p>
+        <div class="card h-100 border-0 shadow-sm p-3">
+            <div class="card-body">
+                <div class="bg-warning bg-opacity-10 d-inline-block p-3 rounded-circle mb-3">
+                    <i class="bi bi-shield-lock text-warning fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Enterprise Security</h5>
+                <p class="text-muted small">
+                    Built with Python Flask security standards. Features strict session management, password hashing,
+                    and role-based access control.
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row align-items-center bg-white p-5 rounded-4 shadow-sm">
-    <div class="col-md-6">
-        <h2 class="fw-bold mb-4">Our Commitment to Care</h2>
-        <p>Our EHR System is designed to reduce the administrative burden on healthcare providers. By centralizing
-            patient records, we enable doctors to focus more on treatment and less on paperwork.</p>
-        <ul class="list-unstyled">
-            <li><i class="bi bi-check2-circle text-success me-2"></i> 360-degree Patient Viewing</li>
-            <li><i class="bi bi-check2-circle text-success me-2"></i> Real-time Database Updates</li>
-            <li><i class="bi bi-check2-circle text-success me-2"></i> Mobile-Responsive Dashboard</li>
-        </ul>
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card bg-dark text-white border-0 shadow rounded-4 overflow-hidden">
+            <div class="row g-0 align-items-center">
+                <div class="col-md-6 p-5">
+                    <h3 class="fw-bold mb-3">System Architecture</h3>
+                    <p class="text-white-50">
+                        This platform is built on a robust Micro-framework architecture designed for scalability and
+                        speed.
+                    </p>
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-info me-3"></i>
+                            <div>
+                                <strong>Backend:</strong> Python & Flask
+                                <div class="small text-white-50">High-performance routing and logic</div>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-info me-3"></i>
+                            <div>
+                                <strong>Database:</strong> MySQL Relational DB
+                                <div class="small text-white-50">Normalized schema for efficient data retrieval</div>
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-info me-3"></i>
+                            <div>
+                                <strong>Frontend:</strong> Bootstrap 5 & Chart.js
+                                <div class="small text-white-50">Responsive design with dynamic data visualization</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 h-100">
+                    <img src="https://img.freepik.com/free-vector/gradient-technology-background_23-2148884153.jpg"
+                        class="img-fluid h-100 w-100 object-fit-cover opacity-75" alt="System Architecture">
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-6 text-center">
-        <img src="https://img.freepik.com/free-photo/medical-technology-concept-doctor-using-digital-tablet_53876-152227.jpg"
-            class="img-fluid rounded-3 shadow" alt="Medical Technology">
+</div>
+
+<div class="row text-center">
+    <div class="col-12 mb-4">
+        <h3 class="fw-bold">Meet the Developer</h3>
+    </div>
+    <div class="col-md-4 mx-auto">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                        class="rounded-circle border border-3 border-light shadow-sm" width="100" height="100"
+                        alt="Developer">
+                </div>
+                <h5 class="fw-bold mb-1">Dr. {{ session.first_name if session.first_name else 'Developer' }}</h5>
+                <p class="text-muted small mb-3">Lead Software Engineer & Medical Student</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="#" class="btn btn-sm btn-outline-dark"><i class="bi bi-github"></i> GitHub</a>
+                    <a href="#" class="btn btn-sm btn-outline-primary"><i class="bi bi-linkedin"></i> LinkedIn</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
