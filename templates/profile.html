@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h4 class="mb-0 fw-bold text-primary"><i class="bi bi-person-badge me-2"></i>My Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/update_profile" method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary">USERNAME (Read-Only)</label>
+                                <input type="text" class="form-control" value="{{ doctor.username }}" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary">MEDICAL ID (Read-Only)</label>
+                                <input type="text" class="form-control" value="{{ doctor.doctor_medical_id }}" disabled>
+                            </div>
+
+                            <div class="col-md-6 mt-4">
+                                <label class="form-label small fw-bold text-secondary">FIRST NAME</label>
+                                <input type="text" name="first_name" class="form-control"
+                                    value="{{ doctor.first_name }}" required>
+                            </div>
+                            <div class="col-md-6 mt-4">
+                                <label class="form-label small fw-bold text-secondary">LAST NAME</label>
+                                <input type="text" name="last_name" class="form-control" value="{{ doctor.last_name }}"
+                                    required>
+                            </div>
+
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label small fw-bold text-secondary">EMAIL ADDRESS</label>
+                                <input type="email" name="email" class="form-control" value="{{ doctor.email }}"
+                                    required>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label small fw-bold text-secondary">SPECIALIZATION / CATEGORY</label>
+                                <input type="text" name="category" class="form-control" value="{{ doctor.category }}">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">
+                                <i class="bi bi-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

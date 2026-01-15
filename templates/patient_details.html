@@ -21,6 +21,19 @@
                         <span class="me-3"><i class="bi bi-person me-1"></i>{{ patient.gender }}</span>
                         <span><i class="bi bi-shield-check me-1"></i>{{ patient.insurance_number }}</span>
                     </div>
+                    <div class="text-muted mt-2 small">
+                        {% if patient.phone %}
+                        <span class="me-3"><i class="bi bi-telephone me-1"></i>{{ patient.phone }}</span>
+                        {% endif %}
+                        {% if patient.email %}
+                        <span class="me-3"><i class="bi bi-envelope me-1"></i>{{ patient.email }}</span>
+                        {% endif %}
+                    </div>
+                    {% if patient.address %}
+                    <div class="text-muted mt-1 small">
+                        <i class="bi bi-geo-alt me-1"></i>{{ patient.address }}
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="col-auto">
                     <div class="d-flex align-items-center gap-3">

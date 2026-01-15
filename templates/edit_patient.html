@@ -67,6 +67,28 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Contact Information -->
+                            <div class="col-md-12 mt-3">
+                                <h6 class="fw-bold text-muted border-bottom pb-2 mb-3">Contact Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-secondary">EMAIL ADDRESS</label>
+                                        <input type="email" name="email" class="form-control"
+                                            value="{{ patient.email or '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-secondary">PHONE NUMBER</label>
+                                        <input type="tel" name="phone" class="form-control"
+                                            value="{{ patient.phone or '' }}">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label small fw-bold text-secondary">ADDRESS</label>
+                                        <textarea name="address" class="form-control"
+                                            rows="2">{{ patient.address or '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-4">

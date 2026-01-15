@@ -186,6 +186,40 @@ def login():
         flash("Invalid username or password", "danger")
     return render_template('login.html')
 
+@app.route('/profile')
+def profile():
+    if 'logged_in' not in session: return redirect(url_for('login'))
+    
+    db = get_db_connection()
+    cur = db.cursor()
+    cur.execute("SELECT * FROM doctors WHERE id = %s", (session['doctor_id'],))
+    doctor = cur.fetchone()
+    db.close()
+    
+    return render_template('profile.html', doctor=doctor)
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    if 'logged_in' not in session: return redirect(url_for('login'))
+    
+    db = get_db_connection()
+    cur = db.cursor()
+    
+    # Update Doctor Info
+    query = """UPDATE doctors SET first_name=%s, last_name=%s, email=%s, category=%s WHERE id=%s"""
+    cur.execute(query, (
+        request.form['first_name'],
+        request.form['last_name'],
+        request.form['email'],
+        request.form['category'],
+        session['doctor_id']
+    ))
+    db.commit()
+    db.close()
+    
+    flash("Profile updated successfully!", "success")
+    return redirect(url_for('profile'))
+
 # --- PATIENT ROUTES (CRUD) ---
 
 @app.route('/patient/<int:id>')
@@ -375,7 +409,8 @@ def update_patient(id):
     # 1. Update Basic Info
     update_query = """UPDATE patients SET 
                       first_name=%s, last_name=%s, insurance_number=%s, age=%s, 
-                      gender=%s, has_allergies=%s, created_at=%s 
+                      gender=%s, has_allergies=%s, created_at=%s,
+                      email=%s, phone=%s, address=%s
                       WHERE id=%s"""
     
     # Handle created_at override if provided, else keep existing?
@@ -388,6 +423,7 @@ def update_patient(id):
         request.form.get('age'), request.form.get('gender'),
         'Yes' if request.form.get('allergies') else 'No',
         request.form.get('created_at'),
+        request.form.get('email'), request.form.get('phone'), request.form.get('address'),
         id
     ))
     
@@ -553,10 +589,14 @@ def add_patient():
         
         reg_date = request.form.get('created_at')
         
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        
         if reg_date:
             query = """INSERT INTO patients (doctor_id, first_name, last_name, insurance_number, 
-                       gender, age, has_allergies, image_path, created_at, is_seen) 
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"""
+                       gender, age, has_allergies, image_path, created_at, email, phone, address, is_seen) 
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"""
             params = (
                 session['doctor_id'], 
                 request.form.get('first_name'), 
@@ -566,12 +606,13 @@ def add_patient():
                 request.form.get('age'),
                 'Yes' if request.form.get('allergies') else 'No', 
                 filename,
-                reg_date
+                reg_date,
+                email, phone, address
             )
         else:
             query = """INSERT INTO patients (doctor_id, first_name, last_name, insurance_number, 
-                       gender, age, has_allergies, image_path, is_seen) 
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 0)"""
+                       gender, age, has_allergies, image_path, email, phone, address, is_seen) 
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"""
             params = (
                 session['doctor_id'], 
                 request.form.get('first_name'), 
@@ -580,7 +621,8 @@ def add_patient():
                 request.form.get('gender'),
                 request.form.get('age'),
                 'Yes' if request.form.get('allergies') else 'No', 
-                filename
+                filename,
+                email, phone, address
             )
             
         cur.execute(query, params)
