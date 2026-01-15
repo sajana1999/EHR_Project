@@ -1,93 +1,114 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% extends "layout.html" %}
+
+{% block content %}
 <div class="row min-vh-100 align-items-center justify-content-center py-5">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0 rounded-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="card glass-card shadow-lg border-0 rounded-4">
             <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="bi bi-person-badge display-4 text-primary"></i>
-                    <h3 class="fw-bold mt-3">Provider Registration</h3>
-                    <p class="text-muted">Join the Medical Network</p>
+                <div class="text-center mb-5">
+                    <div class="bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm mb-3"
+                        style="width: 64px; height: 64px;">
+                        <i class="bi bi-person-badge fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Join the Network</h3>
+                    <p class="text-muted small">Create your professional medical account</p>
                 </div>
 
                 <form method="POST" action="/register">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small fw-bold">FIRST NAME</label>
-                            <input type="text" name="first_name" class="form-control bg-light" required>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" name="first_name" class="form-control" id="fname"
+                                    placeholder="First Name" required>
+                                <label for="fname">First Name</label>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small fw-bold">LAST NAME</label>
-                            <input type="text" name="last_name" class="form-control bg-light" required>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small fw-bold">MEDICAL ID</label>
-                            <input type="text" name="doctor_medical_id" class="form-control bg-light" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small fw-bold">SPECIALTY/CATEGORY</label>
-                            <select name="category" class="form-select bg-light" required>
-                                <option value="" selected disabled>Select Specialty...</option>
-                                <option value="General Practitioner">General Practitioner</option>
-                                <option value="Cardiologist">Cardiologist</option>
-                                <option value="Dermatologist">Dermatologist</option>
-                                <option value="Pediatrician">Pediatrician</option>
-                                <option value="Orthopedic Surgeon">Orthopedic Surgeon</option>
-                                <option value="Neurologist">Neurologist</option>
-                                <option value="Radiologist">Radiologist</option>
-                                <option value="Other">Other</option>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" name="last_name" class="form-control" id="lname"
+                                    placeholder="Last Name" required>
+                                <label for="lname">Last Name</label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">EMAIL ADDRESS</label>
-                        <input type="email" name="email" class="form-control bg-light" required>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" name="doctor_medical_id" class="form-control" id="medId"
+                                    placeholder="Medical ID" required>
+                                <label for="medId">Medical ID</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="category" class="form-select" id="specialty" required>
+                                    <option value="" selected disabled>Select...</option>
+                                    <option value="General Practitioner">General Practitioner</option>
+                                    <option value="Cardiologist">Cardiologist</option>
+                                    <option value="Dermatologist">Dermatologist</option>
+                                    <option value="Pediatrician">Pediatrician</option>
+                                    <option value="Orthopedic Surgeon">Orthopedic Surgeon</option>
+                                    <option value="Neurologist">Neurologist</option>
+                                    <option value="Radiologist">Radiologist</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <label for="specialty">Specialty</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">USERNAME</label>
-                        <input type="text" name="username" class="form-control bg-light" required>
+                    <div class="form-floating mt-3">
+                        <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
+                        <label for="email">Email Address</label>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small fw-bold">PASSWORD</label>
-                            <div class="input-group">
-                                <input type="password" name="password" id="reg_password"
-                                    class="form-control bg-light border-end-0" required
+                    <div class="form-floating mt-3">
+                        <input type="text" name="username" class="form-control" id="reg_username" placeholder="Username"
+                            required>
+                        <label for="reg_username">Username</label>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <div class="form-floating position-relative">
+                                <input type="password" name="password" id="reg_password" class="form-control"
+                                    placeholder="Password" required
                                     pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}"
                                     title="Must contain at least 12 characters, including uppercase, lowercase, numbers, and symbols."
                                     oninput="checkPasswordStrength(this.value)">
-                                <span class="input-group-text bg-light border-start-0 cursor-pointer"
+                                <label for="reg_password">Password</label>
+                                <span class="position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer"
                                     onclick="togglePassword('reg_password', 'toggleRegIcon')">
                                     <i class="bi bi-eye-slash text-muted" id="toggleRegIcon"></i>
                                 </span>
                             </div>
                             <div class="mt-2 text-muted small" id="password-suggestions">
-                                <p class="mb-1 border-bottom pb-1 fw-bold">Password Strength:</p>
-                                <ul class="list-unstyled mb-0 ps-1">
-                                    <li id="req-length" class="text-danger"><i class="bi bi-x mx-1"></i> 12+ characters
+                                <p class="mb-1 border-bottom pb-1 fw-bold text-uppercase ms-1"
+                                    style="font-size: 0.7rem;">Requirements</p>
+                                <ul class="list-unstyled mb-0 ps-1" style="font-size: 0.8rem;">
+                                    <li id="req-length" class="text-danger"><i class="bi bi-circle me-1"></i> 12+ chars
                                     </li>
-                                    <li id="req-upper" class="text-danger"><i class="bi bi-x mx-1"></i> Uppercase letter
+                                    <li id="req-upper" class="text-danger"><i class="bi bi-circle me-1"></i> Uppercase
                                     </li>
-                                    <li id="req-lower" class="text-danger"><i class="bi bi-x mx-1"></i> Lowercase letter
+                                    <li id="req-lower" class="text-danger"><i class="bi bi-circle me-1"></i> Lowercase
                                     </li>
-                                    <li id="req-number" class="text-danger"><i class="bi bi-x mx-1"></i> Number</li>
-                                    <li id="req-symbol" class="text-danger"><i class="bi bi-x mx-1"></i> Symbol</li>
+                                    <li id="req-number" class="text-danger"><i class="bi bi-circle me-1"></i> Number
+                                    </li>
+                                    <li id="req-symbol" class="text-danger"><i class="bi bi-circle me-1"></i> Symbol
+                                    </li>
                                 </ul>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small fw-bold">CONFIRM</label>
-                            <div class="input-group">
-                                <input type="password" name="confirm_password" id="reg_confirm"
-                                    class="form-control bg-light border-end-0" required>
-                                <span class="input-group-text bg-light border-start-0 cursor-pointer"
+                        <div class="col-md-6">
+                            <div class="form-floating position-relative">
+                                <input type="password" name="confirm_password" id="reg_confirm" class="form-control"
+                                    placeholder="Confirm" required>
+                                <label for="reg_confirm">Confirm</label>
+                                <span class="position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer"
                                     onclick="togglePassword('reg_confirm', 'toggleConfirmIcon')">
                                     <i class="bi bi-eye-slash text-muted" id="toggleConfirmIcon"></i>
                                 </span>
@@ -95,68 +116,19 @@
                         </div>
                     </div>
 
-                    <script>
-                        function checkPasswordStrength(password) {
-                            const rules = [
-                                { id: 'req-length', valid: password.length >= 12 },
-                                { id: 'req-upper', valid: /[A-Z]/.test(password) },
-                                { id: 'req-lower', valid: /[a-z]/.test(password) },
-                                { id: 'req-number', valid: /\d/.test(password) },
-                                { id: 'req-symbol', valid: /[\W_]/.test(password) }
-                            ];
-
-                            rules.forEach(rule => {
-                                const el = document.getElementById(rule.id);
-                                const icon = el.querySelector('i');
-                                if (rule.valid) {
-                                    el.classList.remove('text-danger');
-                                    el.classList.add('text-success');
-                                    icon.classList.remove('bi-x');
-                                    icon.classList.add('bi-check-lg');
-                                } else {
-                                    el.classList.remove('text-success');
-                                    el.classList.add('text-danger');
-                                    icon.classList.remove('bi-check-lg');
-                                    icon.classList.add('bi-x');
-                                }
-                            });
-                        }
-
-                        function togglePassword(inputId, iconId) {
-                            const input = document.getElementById(inputId);
-                            const icon = document.getElementById(iconId);
-
-                            if (input.type === "password") {
-                                input.type = "text";
-                                icon.classList.remove("bi-eye-slash");
-                                icon.classList.add("bi-eye");
-                            } else {
-                                input.type = "password";
-                                icon.classList.remove("bi-eye");
-                                icon.classList.add("bi-eye-slash");
-                            }
-                        }
-                    </script>
-
-                    <style>
-                        .cursor-pointer {
-                            cursor: pointer;
-                        }
-                    </style>
-
-                    <div class="mb-4 form-check">
+                    <div class="form-check mt-4 mb-3">
                         <input type="checkbox" class="form-check-input" id="terms" required>
                         <label class="form-check-label small text-muted" for="terms">I verify that I am a licensed
-                            medical professional.</label>
+                            medical professional and agree to terms.</label>
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary py-2 rounded-3 fw-bold shadow-sm">Create
+                        <button type="submit" class="btn btn-primary py-3 rounded-3 fw-bold shadow-sm">Created
                             Account</button>
                     </div>
                 </form>
 
-                <hr class="my-4">
+                <hr class="my-4 text-muted opacity-25">
 
                 <div class="text-center">
                     <span class="text-muted small">Already valid?</span>
@@ -166,4 +138,61 @@
         </div>
     </div>
 </div>
+
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+        z-index: 10;
+    }
+</style>
+
+<script>
+    function checkPasswordStrength(password) {
+        const rules = [
+            { id: 'req-length', valid: password.length >= 12 },
+            { id: 'req-upper', valid: /[A-Z]/.test(password) },
+            { id: 'req-lower', valid: /[a-z]/.test(password) },
+            { id: 'req-number', valid: /\d/.test(password) },
+            { id: 'req-symbol', valid: /[\W_]/.test(password) }
+        ];
+
+        rules.forEach(rule => {
+            const el = document.getElementById(rule.id);
+            const icon = el.querySelector('i');
+            if (rule.valid) {
+                el.classList.remove('text-danger');
+                el.classList.add('text-success');
+                icon.classList.remove('bi-circle');
+                icon.classList.add('bi-check-circle-fill');
+            } else {
+                el.classList.remove('text-success');
+                el.classList.add('text-danger');
+                icon.classList.remove('bi-check-circle-fill');
+                icon.classList.add('bi-circle');
+            }
+        });
+    }
+
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        } else {
+            input.type = "password";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        }
+    }
+</script>
 {% endblock %}

@@ -1,153 +1,257 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-4 mb-5">
-    <div class="row">
-        <!-- Sidebar: Patient Search -->
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-search me-2"></i>Find Patient</h5>
-                </div>
-                <div class="card-body">
-                    <form method="GET" action="/appointments">
-                        <div class="input-group mb-3">
-                            <input type="text" name="search" class="form-control" placeholder="Name or Insurance ID"
-                                value="{{ request.args.get('search', '') }}">
-                            <button class="btn btn-outline-primary" type="submit">Search</button>
-                        </div>
-                    </form>
+<style>
+    .queue-card {
+        transition: all 0.2s;
+        cursor: pointer;
+        border-left: 4px solid transparent;
+    }
 
-                    {% if patients %}
-                    <div class="list-group list-group-flush border-top">
-                        {% for p in patients %}
-                        <a href="/appointments?patient_id={{ p.id }}&search={{ request.args.get('search', '') }}"
-                            class="list-group-item list-group-item-action {% if selected_patient and selected_patient.id == p.id %}active{% endif %}">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1 fw-bold">{{ p.first_name }} {{ p.last_name }}</h6>
-                                    <small
-                                        class="{% if selected_patient and selected_patient.id == p.id %}text-white-50{% else %}text-muted{% endif %}">#{{
-                                        p.insurance_number }}</small>
-                                </div>
-                                <i class="bi bi-chevron-right"></i>
-                            </div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                    {% elif request.args.get('search') %}
-                    <div class="text-center text-muted py-3">No patients found.</div>
-                    {% endif %}
-                </div>
-            </div>
+    .queue-card:hover {
+        background-color: #f8f9fa;
+        transform: translateX(4px);
+    }
 
-            <div class="alert alert-info small">
-                <i class="bi bi-info-circle-fill me-1"></i>
-                Selected Patient:
-                {% if selected_patient %}
-                <strong>{{ selected_patient.first_name }} {{ selected_patient.last_name }}</strong>
-                {% else %}
-                <em>None</em>
-                {% endif %}
+    .queue-card.active {
+        background-color: #e7f1ff;
+        border-left-color: #0d6efd;
+    }
+
+    .vitals-input-group .input-group-text {
+        background-color: #f8f9fa;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #6c757d;
+        width: 80px;
+    }
+
+    .station-header {
+        background: linear-gradient(to right, #ffffff, #f8f9fa);
+    }
+</style>
+
+<div class="row h-100 g-0">
+    <!-- LEFT PANEL: QUEUE & SEARCH -->
+    <div class="col-md-4 col-xl-3 border-end bg-white d-flex flex-column h-100" id="queuePanel"
+        style="min-height: calc(100vh - 80px);">
+        <div class="p-3 border-bottom station-header">
+            <h6 class="fw-bold text-dark mb-1"><i class="bi bi-people me-2 text-primary"></i>Daily Queue</h6>
+            <div class="text-muted small">{{ get_today_date }}</div>
+        </div>
+
+        <!-- Search -->
+        <div class="p-3 border-bottom bg-light">
+            <div class="position-relative">
+                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                <input type="text" id="patientSearch" class="form-control rounded-pill ps-5 border-0 shadow-sm"
+                    placeholder="Find patient..." autocomplete="off">
+                <div id="searchResults" class="list-group position-absolute w-100 mt-2 shadow-lg"
+                    style="z-index: 1050; display: none;"></div>
             </div>
         </div>
 
-        <!-- Main: Clinical Form -->
-        <div class="col-md-8">
-            {% if selected_patient %}
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0 fw-bold text-primary">New Clinical Appointment</h4>
-                        <p class="text-muted small mb-0">Adding visit for: {{ selected_patient.first_name }} {{
-                            selected_patient.last_name }} ({{ selected_patient.age }} yrs)</p>
+        <!-- List -->
+        <div class="flex-grow-1 overflow-auto bg-light">
+            {% if today_appts %}
+            <div class="list-group list-group-flush" id="queueList">
+                {% for appt in today_appts %}
+                <div class="list-group-item list-group-item-action p-3 queue-card border-bottom"
+                    data-appt='{{ appt | tojson | forceescape }}'
+                    onclick="startEncounter(this, JSON.parse(this.dataset.appt))">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold text-dark">{{ appt.first_name }} {{ appt.last_name }}</span>
+                        <span
+                            class="badge {% if appt.status == 'Completed' %}bg-success-subtle text-success{% else %}bg-primary-subtle text-primary{% endif %} rounded-pill ultra-small">{{
+                            appt.appointment_time }}</span>
                     </div>
-                    <span class="badge bg-light text-dark border">{{ selected_patient.gender }}</span>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div class="small text-muted text-truncate" style="max-width: 180px;">{{ appt.reason_for_visit
+                            }}</div>
+                        {% if appt.status == 'Completed' %}
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        {% endif %}
+                    </div>
                 </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center p-5 text-muted opacity-50">
+                <i class="bi bi-cup-hot display-4 mb-3"></i>
+                <p>No appointments today.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: WORKSPACE -->
+    <div class="col-md-8 col-xl-9 bg-light h-100 overflow-auto">
+        <!-- Empty State -->
+        <div id="emptyState" class="d-flex flex-column align-items-center justify-content-center h-100 p-5 text-muted">
+            <div class="bg-white p-4 rounded-circle shadow-sm mb-4">
+                <i class="bi bi-clipboard-pulse display-1 text-primary opacity-50"></i>
+            </div>
+            <h3>Clinical Station</h3>
+            <p>Select a patient from the queue to start an encounter.</p>
+        </div>
+
+        <!-- Encounter Form -->
+        <div id="encounterWorkspace" class="d-none p-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+                <!-- Header -->
+                <div
+                    class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary-subtle text-primary rounded-circle p-2 me-3 fw-bold" id="avatarInitials">
+                            JD</div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0" id="encPatientName">Patient Name</h5>
+                            <span class="text-muted small" id="encPatientDetails">ID: -- | Age: --</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill" id="encStatusBadge">In
+                        Progress</span>
+                </div>
+
+                <!-- Form -->
                 <div class="card-body p-4">
                     <form method="POST" action="/appointments" enctype="multipart/form-data">
-                        <input type="hidden" name="patient_id" value="{{ selected_patient.id }}">
+                        <input type="hidden" name="appointment_id" id="encApptId">
+                        <input type="hidden" name="patient_id" id="encPatientId">
 
-                        <!-- Date & Weight -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-secondary">APPOINTMENT DATE</label>
-                                <input type="date" name="appointment_date" id="appt_date" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-secondary">WEIGHT (kg)</label>
-                                <input type="number" step="0.1" name="weight" class="form-control" placeholder="0.0">
-                            </div>
-                        </div>
-
-                        <!-- Diagnosis -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-secondary">PRIMARY DIAGNOSIS</label>
-                            <input type="text" name="diagnosis" class="form-control"
-                                placeholder="e.g. Hypertension, Acute Bronchitis" required>
-                        </div>
-
-                        <!-- Notes -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-secondary">CLINICAL NOTES</label>
-                            <textarea name="clinical_notes" class="form-control" rows="4"
-                                placeholder="Subjective, Objective, Assessment, Plan..."></textarea>
-                        </div>
-
-                        <!-- Prescription -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small text-secondary">PRESCRIPTION</label>
-                            <textarea name="prescription" class="form-control bg-light" rows="3"
-                                placeholder="Medications, dosage, frequency..."></textarea>
-                        </div>
-
-                        <!-- File Uploads -->
-                        <div class="mb-4 p-3 bg-light rounded border">
-                            <label class="form-label fw-bold small text-secondary d-block"><i
-                                    class="bi bi-paperclip me-1"></i>RECORDS & REPORTS</label>
-                            <div id="file-list">
-                                <div class="mb-2">
-                                    <input type="file" name="medical_docs" class="form-control form-control-sm">
+                        <!-- Vitals Section -->
+                        <div class="p-3 bg-light rounded-3 mb-4 border border-light-subtle">
+                            <h6 class="text-uppercase text-secondary fw-bold small mb-3 ls-1"><i
+                                    class="bi bi-activity me-2"></i>Vitals Entry</h6>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">BP</span>
+                                        <input type="text" name="blood_pressure" id="encBP" class="form-control"
+                                            placeholder="--/--">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">Temp</span>
+                                        <input type="number" step="0.1" name="temperature" id="encTemp"
+                                            class="form-control" placeholder="--">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">Pulse</span>
+                                        <input type="number" name="pulse_rate" id="encPulse" class="form-control"
+                                            placeholder="--">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">SpO2</span>
+                                        <input type="number" name="sp_o2" id="encSpO2" class="form-control"
+                                            placeholder="--">
+                                    </div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-link text-decoration-none"
-                                onclick="addFileField()">
-                                <i class="bi bi-plus-circle me-1"></i>Add Another Document
-                            </button>
                         </div>
 
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">Save Clinical
-                                Record</button>
+                        <!-- Clinical Findings -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-7">
+                                <label class="form-label small fw-bold text-secondary">CLINICAL NOTES (SOAP)</label>
+                                <textarea name="clinical_notes" id="encNotes" class="form-control shadow-sm" rows="12"
+                                    placeholder="Subjective, Objective, Assessment, Plan..."
+                                    style="resize: none;"></textarea>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-secondary">FINAL DIAGNOSIS</label>
+                                    <input type="text" name="final_diagnosis" id="encDiagnosis"
+                                        class="form-control shadow-sm fw-bold" placeholder="Primary Diagnosis">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-secondary">PRESCRIPTION / RX</label>
+                                    <textarea name="prescription" id="encPrescription"
+                                        class="form-control shadow-sm bg-info-subtle border-info-subtle" rows="5"
+                                        placeholder="Medications, Dosage, Frequency..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-secondary">ATTACHMENTS</label>
+                                    <input class="form-control form-control-sm" type="file" name="medical_docs"
+                                        multiple>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end pt-3 border-top">
+                            <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm fw-bold">
+                                <i class="bi bi-save me-2"></i>Finalize Encounter
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
-            {% else %}
-            <div class="card border-0 border-start border-4 border-info shadow-sm h-100">
-                <div
-                    class="card-body d-flex flex-column justify-content-center align-items-center text-center p-5 text-muted">
-                    <i class="bi bi-person-bounding-box display-3 mb-3 text-info opacity-50"></i>
-                    <h5>Patient Not Selected</h5>
-                    <p>Search for a patient on the left to start a new clinical appointment entry.</p>
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>
 
 <script>
-    // Default date to today
-    if (document.getElementById('appt_date')) {
-        document.getElementById('appt_date').valueAsDate = new Date();
+    const searchInput = document.getElementById('patientSearch');
+    const resultsDiv = document.getElementById('searchResults');
+
+    function startEncounter(element, appt) {
+        // UI State
+        document.querySelectorAll('.queue-card').forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        document.getElementById('emptyState').classList.add('d-none');
+        document.getElementById('encounterWorkspace').classList.remove('d-none');
+
+        // Populate Header
+        document.getElementById('encPatientName').innerText = appt.first_name + ' ' + appt.last_name;
+        document.getElementById('avatarInitials').innerText = (appt.first_name[0] + appt.last_name[0]).toUpperCase();
+        document.getElementById('encPatientDetails').innerText = `ID: ${appt.insurance_number} | Age: ${appt.age}`;
+
+        // Populate Form
+        document.getElementById('encApptId').value = appt.id;
+        document.getElementById('encPatientId').value = appt.patient_id;
+
+        document.getElementById('encBP').value = appt.blood_pressure || '';
+        document.getElementById('encTemp').value = appt.temperature || '';
+        document.getElementById('encPulse').value = appt.pulse_rate || '';
+        document.getElementById('encSpO2').value = appt.sp_o2 || '';
+
+        document.getElementById('encDiagnosis').value = appt.final_diagnosis || appt.reason_for_visit || '';
+        document.getElementById('encNotes').value = appt.clinical_notes || '';
+        document.getElementById('encPrescription').value = appt.prescription || '';
+
+        // Status Badge
+        const badge = document.getElementById('encStatusBadge');
+        if (appt.status === 'Completed') {
+            badge.className = 'badge bg-success text-white px-3 py-2 rounded-pill';
+            badge.innerText = 'Completed';
+        } else {
+            badge.className = 'badge bg-warning text-dark px-3 py-2 rounded-pill';
+            badge.innerText = 'In Progress';
+        }
     }
 
-    function addFileField() {
-        var div = document.createElement('div');
-        div.className = 'mb-2';
-        div.innerHTML = '<input type="file" name="medical_docs" class="form-control form-control-sm">';
-        document.getElementById('file-list').appendChild(div);
-    }
+    // Search (UX: Just highlight or filter list? Because this is TODAY's queue)
+    // The prompt implies we might search for a patient to open their encounter.
+    // However, encounters are usually tied to appointments.
+    // Let's implement filter for the left list.
+    searchInput.addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const items = document.querySelectorAll('.queue-card');
+        items.forEach(item => {
+            const text = item.innerText.toLowerCase();
+            if (text.includes(query)) {
+                item.classList.remove('d-none');
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+    });
 </script>
 {% endblock %}

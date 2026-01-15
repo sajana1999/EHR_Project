@@ -4,7 +4,7 @@ import pymysql
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'KINGsajana*',  
+    'password': 'root*',  
     'database': 'ehr_system',
     'cursorclass': pymysql.cursors.DictCursor
 }

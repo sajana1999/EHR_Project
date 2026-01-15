@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle p-3 me-3 shadow-sm">
+                    <i class="bi bi-person-gear fs-3"></i>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0 text-dark">Account Settings</h2>
+                    <p class="text-muted mb-0">Manage your profile information and security preferences.</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- 1. Personal Details -->
+                <div class="col-md-7">
+                    <div class="card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-header bg-white py-3 px-4 border-bottom">
+                            <h6 class="mb-0 fw-bold text-secondary text-uppercase ls-1">Personal Information</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="/update_profile" method="POST">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control bg-light" id="username"
+                                                value="{{ doctor.username }}" disabled>
+                                            <label for="username">Username</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control bg-light" id="medicalId"
+                                                value="{{ doctor.doctor_medical_id }}" disabled>
+                                            <label for="medicalId">Medical ID</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" name="first_name" class="form-control" id="firstName"
+                                                value="{{ doctor.first_name }}" required>
+                                            <label for="firstName">First Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" name="last_name" class="form-control" id="lastName"
+                                                value="{{ doctor.last_name }}" required>
+                                            <label for="lastName">Last Name</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" name="category" class="form-control" id="specialization"
+                                                value="{{ doctor.category }}">
+                                            <label for="specialization">Specialization / Role</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                                    <button type="submit"
+                                        class="btn btn-primary px-4 py-2 shadow-sm rounded-pill fw-bold">
+                                        <i class="bi bi-check2-circle me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Security Settings -->
+                <div class="col-md-5">
+                    <div class="card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-header bg-white py-3 px-4 border-bottom">
+                            <h6 class="mb-0 fw-bold text-secondary text-uppercase ls-1">Security & Access</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Change Email -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-dark mb-3"><i
+                                        class="bi bi-envelope me-2 text-primary"></i>Update Email</h6>
+                                <form action="/request_email_change" method="POST">
+                                    <div class="form-floating mb-2">
+                                        <input type="email" class="form-control bg-light" value="{{ doctor.email }}"
+                                            disabled>
+                                        <label>Current Email</label>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="form-floating flex-grow-1">
+                                            <input type="email" name="new_email" class="form-control" id="newEmail"
+                                                placeholder="New Email" required>
+                                            <label for="newEmail">New Email Address</label>
+                                        </div>
+                                        <button class="btn btn-outline-primary px-3" type="submit">Verify</button>
+                                    </div>
+                                    <div class="form-text small mt-1"><i class="bi bi-info-circle me-1"></i>Verification
+                                        link sent on submit.</div>
+                                </form>
+                            </div>
+
+                            <hr class="text-secondary opacity-25">
+
+                            <!-- Change Password -->
+                            <div class="mt-4">
+                                <h6 class="fw-bold text-dark mb-3"><i
+                                        class="bi bi-shield-lock me-2 text-primary"></i>Change Password</h6>
+                                <form action="/change_password" method="POST">
+                                    <div class="form-floating mb-2">
+                                        <input type="password" name="current_password" class="form-control"
+                                            id="currPass" placeholder="Current" required>
+                                        <label for="currPass">Current Password</label>
+                                    </div>
+                                    <div class="form-floating mb-2">
+                                        <input type="password" name="new_password" class="form-control" id="newPass"
+                                            placeholder="New" required>
+                                        <label for="newPass">New Password</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="password" name="confirm_password" class="form-control"
+                                            id="confPass" placeholder="Confirm" required>
+                                        <label for="confPass">Confirm Password</label>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-warning text-dark fw-bold shadow-sm">
+                                            Update Password
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
