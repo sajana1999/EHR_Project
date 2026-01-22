@@ -1,0 +1,190 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-white shadow-sm rounded-3 me-3"><i
+                    class="bi bi-arrow-left"></i></a>
+            <div>
+                <h4 class="fw-bold text-dark mb-0">Register Patient</h4>
+                <p class="text-muted small mb-0">Create a new patient demographic record.</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <!-- Profile Image Section -->
+                        <div class="col-md-3 text-center mb-4 mb-md-0 border-end border-light">
+                            <div class="position-relative d-inline-block">
+                                <img id="preview" src="https://via.placeholder.com/150"
+                                    class="rounded-circle shadow-sm border border-4 border-white mb-3"
+                                    style="width: 140px; height: 140px; object-fit: cover;">
+                                <label
+                                    class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0 mb-3 me-2 shadow-sm"
+                                    style="width: 32px; height: 32px; padding: 0.25rem;">
+                                    <i class="bi bi-camera-fill"></i>
+                                    <input type="file" name="patient_img" class="d-none" onchange="previewImage(event)">
+                                </label>
+                            </div>
+                            <h6 class="fw-bold text-dark mt-2">Profile Photo</h6>
+                            <p class="text-muted small">Allowed: JPG, PNG</p>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="col-md-9 ps-md-5">
+                            <h6 class="text-uppercase text-primary text-xs fw-bolder mb-3 letter-spacing-1">Personal
+                                Details</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="first_name" class="form-control" id="firstName"
+                                            placeholder="First Name" required>
+                                        <label for="firstName">First Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="last_name" class="form-control" id="lastName"
+                                            placeholder="Last Name" required>
+                                        <label for="lastName">Last Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="number" name="age" class="form-control" id="age" placeholder="Age"
+                                            required>
+                                        <label for="age">Age</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="px-2">
+                                        <label class="d-block text-secondary small fw-bold mb-2">GENDER</label>
+                                        <div class="d-flex gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="gender"
+                                                    id="genderMale" value="Male" checked>
+                                                <label class="form-check-label" for="genderMale">Male</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="gender"
+                                                    id="genderFemale" value="Female">
+                                                <label class="form-check-label" for="genderFemale">Female</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="text" name="insurance_number" class="form-control" id="insurance"
+                                            placeholder="Insurance ID">
+                                        <label for="insurance">Insurance ID</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <input type="date" name="created_at" id="reg_date" class="form-control"
+                                            placeholder="Registration Date">
+                                        <label for="reg_date">Registration Date</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="text-uppercase text-primary text-xs fw-bolder mb-3 letter-spacing-1">Contact
+                                Information</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" name="email" class="form-control" id="email"
+                                            placeholder="Email">
+                                        <label for="email">Email Address</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="tel" name="phone" class="form-control" id="phone"
+                                            placeholder="Phone">
+                                        <label for="phone">Phone Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea name="address" class="form-control" id="address" placeholder="Address"
+                                            style="height: 80px"></textarea>
+                                        <label for="address">Full Address</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="text-uppercase text-primary text-xs fw-bolder mb-3 letter-spacing-1">Medical
+                                Background</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea name="medical_history" class="form-control" id="history"
+                                            placeholder="Medical History" style="height: 100px"></textarea>
+                                        <label for="history">Past Medical History / Chronic Conditions</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ALLERGIES SECTION -->
+                            <div class="bg-light p-4 rounded-3 border">
+                                <h6 class="text-uppercase text-secondary small fw-bold mb-3">Allergies Information</h6>
+                                <div class="row">
+                                    {% for allergy in ['Penicillin', 'Peanuts', 'Latex', 'Pollen', 'Shellfish', 'Dairy',
+                                    'Dust Mites'] %}
+                                    <div class="col-md-4 col-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="allergies"
+                                                value="{{ allergy }}" id="allergy{{ loop.index }}">
+                                            <label class="form-check-label" for="allergy{{ loop.index }}">
+                                                {{ allergy }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                    <!-- 'Other' Option -->
+                                    <div class="col-md-12 mt-2">
+                                        <div class="form-check d-flex align-items-center">
+                                            <input class="form-check-input me-2" type="checkbox" id="checkOther"
+                                                onclick="document.getElementById('otherInput').disabled = !this.checked; document.getElementById('otherInput').focus();">
+                                            <label class="form-check-label me-2 text-nowrap"
+                                                for="checkOther">Other:</label>
+                                            <input type="text" name="other_allergy" id="otherInput"
+                                                class="form-control form-control-sm border-0 border-bottom bg-transparent rounded-0"
+                                                placeholder="Specify..." disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-5">
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-light px-4">Cancel</a>
+                                <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">Complete
+                                    Registration</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var output = document.getElementById('preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+    // Set default date to today
+    document.getElementById('reg_date').valueAsDate = new Date();
+</script>
+{% endblock %}

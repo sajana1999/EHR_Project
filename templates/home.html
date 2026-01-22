@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City General Hospital | Staff Portal</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            /* Very light gray */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1. Utility Navbar */
+        .navbar-utility {
+            background-color: #1a202c;
+            /* Dark Slate */
+            color: #cbd5e0;
+            font-size: 0.9rem;
+            border-bottom: 4px solid #0056b3;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: white !important;
+            letter-spacing: 0.5px;
+        }
+
+        .clock-widget {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: #63b3ed;
+        }
+
+        /* Card Heights */
+        .h-custom-card {
+            height: 100%;
+        }
+
+        /* 2. Login Zone (Left) */
+        .login-card {
+            border: none;
+            border-top: 5px solid #0056b3;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: white;
+            height: 100%;
+        }
+
+        .monitor-badge {
+            font-size: 0.75rem;
+            background: #edf2f7;
+            color: #718096;
+            margin-top: 1rem;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* 3. Notice Board (Right) */
+        .notice-board-title {
+            color: #2d3748;
+            font-weight: 700;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .notice-item {
+            border: none;
+            border-left: 4px solid #cbd5e0;
+            background: white;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .notice-item:hover {
+            border-left-color: #0056b3;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transform: translateX(2px);
+        }
+
+        /* 4. Quick Links */
+        .quick-link-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quick-link-card:hover {
+            border-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .ql-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 5. Footer */
+        .status-footer {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            font-size: 0.8rem;
+            padding: 6px 0;
+            border-top: 1px solid #cbd5e0;
+            margin-top: auto;
+            /* Push to bottom */
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #28a745;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 1. Utility Navbar -->
+    <nav class="navbar navbar-utility py-2 shadow-sm">
+        <div class="container">
+            <span class="navbar-brand d-flex align-items-center">
+                <i class="bi bi-building-fill me-2"></i> City General Hospital - Staff Portal
+            </span>
+            <div class="d-flex align-items-center gap-4">
+                <div id="liveClock" class="clock-widget d-none d-md-block">--:--:--</div>
+                <a href="#" class="text-decoration-none text-light opacity-75 small hover-opacity">
+                    <i class="bi bi-headset me-1"></i> Help Desk: Ext 5500
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Grid (Fills remaining height) -->
+    <div class="container py-4 flex-grow-1 d-flex flex-column">
+
+        <!-- Top Row (Login + Notices) ~70% -->
+        <div class="row g-4 flex-grow-1 mb-4">
+
+            <!-- Login Zone (40%) -->
+            <div class="col-lg-5">
+                <div class="card login-card p-4 d-flex flex-column justify-content-center h-100">
+                    <div class="mb-4">
+                        <h4 class="fw-bold text-dark mb-1">Secure Access</h4>
+                        <p class="text-secondary small mb-0">Please identify yourself to proceed.</p>
+                    </div>
+
+                    {% if session.get('logged_in') %}
+                    <!-- Logged In State -->
+                    <div class="text-center py-4">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex p-3 mb-3 shadow-sm">
+                            <i class="bi bi-person-fill fs-3"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Welcome, Dr. {{ session.get('username') }}</h5>
+                        <p class="text-muted small mb-4">Last login: Today, 08:30 AM</p>
+
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                                <i class="bi bi-grid-fill me-2"></i>Open Dashboard
+                            </a>
+                            <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary btn-sm">
+                                Logout safely
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Logged Out State -->
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('login') }}"
+                            class="btn btn-primary btn-lg fw-bold shadow-sm text-start px-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span><i class="bi bi-person-badge-fill me-2"></i> Doctor Login</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </div>
+                        </a>
+                        <div class="text-center">
+                            <span class="text-muted small">New to the system?</span>
+                            <a href="{{ url_for('register') }}" class="fw-bold text-secondary ms-1">Register Staff
+                                ID</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="text-center mt-auto">
+                        <div class="monitor-badge">
+                            <i class="bi bi-shield-lock me-1"></i> This system is monitored. IP Logged.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notice Board (60%) -->
+            <div class="col-lg-7">
+                <div class="h-100 d-flex flex-column">
+                    <!-- Using a wrapper to ensure height match if needed, but notices fill naturally. 
+                        Let's keep the title outside and notices list inside. -->
+                    <h5 class="notice-board-title"><i class="bi bi-megaphone-fill text-primary me-2"></i>Clinical
+                        Updates & Announcements</h5>
+
+                    <div class="list-group flex-grow-1 overflow-auto">
+                        <!-- Notice 1 -->
+                        <div class="list-group-item notice-item p-3 d-flex align-items-start">
+                            <div class="notice-icon me-3 text-danger"><i class="bi bi-exclamation-circle-fill"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="fw-bold mb-1 text-dark">New COVID-19 Screening Protocols</h6>
+                                    <small class="text-muted">Jan 15</small>
+                                </div>
+                                <p class="mb-0 text-secondary small">Effective immediately, all outpatient admissions
+                                    require rapid antigen testing. Please review the updated PDF in the Policy folder.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Notice 2 -->
+                        <div class="list-group-item notice-item p-3 d-flex align-items-start">
+                            <div class="notice-icon me-3 text-warning"><i class="bi bi-cone-striped"></i></div>
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="fw-bold mb-1 text-dark">Radiology Server Maintenance</h6>
+                                    <small class="text-muted">Upcoming</small>
+                                </div>
+                                <p class="mb-0 text-secondary small">Scheduled maintenance for PACS servers this Sunday
+                                    from 02:00 AM to 04:00 AM. Image retrieval will be unavailable.</p>
+                            </div>
+                        </div>
+
+                        <!-- Notice 3 -->
+                        <div class="list-group-item notice-item p-3 d-flex align-items-start">
+                            <div class="notice-icon me-3 text-info"><i class="bi bi-people-fill"></i></div>
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="fw-bold mb-1 text-dark">Staff Welcome</h6>
+                                    <small class="text-muted">Jan 12</small>
+                                </div>
+                                <p class="mb-0 text-secondary small">Please join us in welcoming Dr. Sarah Smith to the
+                                    Neurology Department. She joins us from Mayo Clinic.</p>
+                            </div>
+                        </div>
+
+                        <!-- Notice 4 -->
+                        <div class="list-group-item notice-item p-3 d-flex align-items-start">
+                            <div class="notice-icon me-3 text-primary"><i class="bi bi-calendar-event"></i></div>
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="fw-bold mb-1 text-dark">Grand Rounds: Cardiology</h6>
+                                    <small class="text-muted">Jan 10</small>
+                                </div>
+                                <p class="mb-0 text-secondary small">Topic: Interventional approaches to structural
+                                    heart disease. Auditorium B, 12:00 PM.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Quick Links (Department Shortcuts) ~20% -->
+        <div class="row pt-3 border-top">
+            <h6 class="text-uppercase text-muted fw-bold small mb-3 ls-1" style="letter-spacing: 1px;">Department
+                Shortcuts</h6>
+            <div class="col-md-3 mb-2">
+                <div class="quick-link-card">
+                    <i class="bi bi-bandaid-fill text-danger ql-icon"></i>
+                    <span class="fw-bold text-dark small">Emergency Protocols</span>
+                </div>
+            </div>
+            <div class="col-md-3 mb-2">
+                <div class="quick-link-card">
+                    <i class="bi bi-telephone-fill text-primary ql-icon"></i>
+                    <span class="fw-bold text-dark small">On-Call Schedule</span>
+                </div>
+            </div>
+            <div class="col-md-3 mb-2">
+                <div class="quick-link-card">
+                    <i class="bi bi-capsule text-success ql-icon"></i>
+                    <span class="fw-bold text-dark small">Pharmacy Formulary</span>
+                </div>
+            </div>
+            <div class="col-md-3 mb-2">
+                <div class="quick-link-card">
+                    <i class="bi bi-pc-display text-secondary ql-icon"></i>
+                    <span class="fw-bold text-dark small">IT Support Request</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 4. Footer (System Stats) -->
+    <footer class="status-footer mt-auto">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-4">
+                <span>System Version: <span class="fw-bold">v2.4.1</span></span>
+                <span><span class="status-dot"></span>Database: <span class="fw-bold">Connected</span></span>
+            </div>
+            <div>
+                <span>Server Load: <span class="fw-bold text-success">12%</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+            document.getElementById('liveClock').innerText = `${dateString} | ${timeString}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+
+</html>

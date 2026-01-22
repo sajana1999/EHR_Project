@@ -1,16 +1,170 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="card shadow p-5">
-    <h1>About Our EHR System</h1>
-    <p class="lead">This Electronic Health Record system is designed to help doctors manage patient data securely and efficiently.</p>
-    <hr>
-    <h3>Key Features:</h3>
-    <ul>
-        <li>Secure Doctor Login</li>
-        <li>Patient Record Management (CRUD)</li>
-        <li>Image Upload for Radiology</li>
-        <li>Automated Appointment Scheduling</li>
-    </ul>
+<!-- 1. HERO SECTION -->
+<div class="bg-primary text-white py-5 mb-5 rounded-3 shadow-sm mx-3 mt-3">
+    <div class="container text-center py-5">
+        <h1 class="display-4 fw-bold mb-3"><i class="bi bi-activity me-3"></i>Transforming Healthcare Data into Clinical
+            Insight.</h1>
+        <p class="lead mb-0 text-white-50 mx-auto" style="max-width: 800px;">
+            Our mission is to eliminate fragmented paper records and provide doctors with a centralized, secure, and
+            longitudinal view of patient health, enabling data-driven decisions at the point of care.
+        </p>
+    </div>
+</div>
+
+<div class="container mb-5">
+
+    <!-- 2. STRATEGIC GOALS -->
+    <div class="row text-center mb-5 g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="mb-3 text-primary"><i class="bi bi-compass fs-1"></i></div>
+                    <h5 class="fw-bold text-uppercase">Current Goal</h5>
+                    <p class="text-muted small">Streamlining the Patient-Doctor encounter workflow to reduce
+                        administrative burden and increase patient interaction time.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="mb-3 text-warning"><i class="bi bi-rocket-takeoff fs-1"></i></div>
+                    <h5 class="fw-bold text-uppercase">Near Future</h5>
+                    <p class="text-muted small">Implementing Role-Based Access Control (RBAC) for nurse/admin workflows
+                        and integrating external Pharmacy APIs for e-prescriptions.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="mb-3 text-success"><i class="bi bi-stars fs-1"></i></div>
+                    <h5 class="fw-bold text-uppercase">Long-Term Target</h5>
+                    <p class="text-muted small">Developing AI-driven diagnostic suggestions based on historical data and
+                        launching a dedicated Mobile App for patient self-service.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5 text-muted">
+
+    <!-- 3. SYSTEM ARCHITECTURE -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-5">
+            <h2 class="fw-bold text-dark"><i class="bi bi-cpu me-2"></i>System Architecture</h2>
+            <p class="text-secondary">Our platform is built on a robust, scalable technical stack designed for
+                reliability and security.</p>
+            <ul class="list-unstyled mt-3">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Backend:</strong>
+                    Python Flask</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Database:</strong>
+                    MySQL (Relational)</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Frontend:</strong>
+                    Bootstrap 5 & Jinja2</li>
+                <li class="mb-2"><i class="bi bi-shield-lock-fill text-danger me-2"></i><strong>Security:</strong>
+                    Bcrypt Hashing & parameterized queries</li>
+                <li><i class="bi bi-database-lock me-2 text-success"></i><strong>Data Integrity:</strong> Strict Foreign
+                    Key constraints</li>
+            </ul>
+        </div>
+        <div class="col-md-7">
+            <div class="p-4 bg-light rounded-3 border">
+                <div class="d-flex justify-content-between text-center font-monospace small">
+                    <div class="p-3 bg-white rounded shadow-sm border">
+                        <i class="bi bi-window-sidebar fs-2 d-block mb-2 text-primary"></i>
+                        Frontend
+                    </div>
+                    <div class="align-self-center text-muted"><i class="bi bi-arrow-left-right"></i> HTTP/JSON</div>
+                    <div class="p-3 bg-white rounded shadow-sm border">
+                        <i class="bi bi-hdd-rack fs-2 d-block mb-2 text-success"></i>
+                        Flask API
+                    </div>
+                    <div class="align-self-center text-muted"><i class="bi bi-arrow-left-right"></i> SQL</div>
+                    <div class="p-3 bg-white rounded shadow-sm border">
+                        <i class="bi bi-database fs-2 d-block mb-2 text-secondary"></i>
+                        MySQL DB
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. KEY FEATURES -->
+    <h3 class="fw-bold text-center mb-4"><i class="bi bi-lightning-charge me-2"></i>Key Capabilities</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-3">
+            <div class="card h-100 border-primary bg-primary bg-opacity-10 text-center p-3">
+                <i class="bi bi-layout-split fs-2 text-primary"></i>
+                <h6 class="fw-bold mt-2">Split-Pane View</h6>
+                <p class="small mb-0 text-muted">Efficient Timeline & Detail access.</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-success bg-success bg-opacity-10 text-center p-3">
+                <i class="bi bi-envelope-check fs-2 text-success"></i>
+                <h6 class="fw-bold mt-2">Auto Notifications</h6>
+                <p class="small mb-0 text-muted">Instant confirmation emails.</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-warning bg-warning bg-opacity-10 text-center p-3">
+                <i class="bi bi-calculator fs-2 text-warning"></i>
+                <h6 class="fw-bold mt-2">Real-time Calc</h6>
+                <p class="small mb-0 text-muted">Auto-computed Age & BMI.</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-info bg-info bg-opacity-10 text-center p-3">
+                <i class="bi bi-file-earmark-medical fs-2 text-info"></i>
+                <h6 class="fw-bold mt-2">Secure Uploads</h6>
+                <p class="small mb-0 text-muted">Attach PDF/JPG reports.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5 text-muted">
+
+    <!-- 5. MEET THE TEAM -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-4"><i class="bi bi-code-slash me-2"></i>The Engineering Team</h2>
+        <div class="row justify-content-center g-4">
+            <!-- Ravindu -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow hover-card">
+                    <div class="card-body p-4">
+                        <div class="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                            style="width: 80px; height: 80px;">
+                            <i class="bi bi-person-fill fs-1 text-secondary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1">Ravindu</h4>
+                        <p class="text-primary small fw-bold mb-3">Full Stack Developer</p>
+                        <a href="https://github.com/ravindu47" target="_blank" class="btn btn-dark w-100">
+                            <i class="bi bi-github me-2"></i>GitHub Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Sajana -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow hover-card">
+                    <div class="card-body p-4">
+                        <div class="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                            style="width: 80px; height: 80px;">
+                            <i class="bi bi-person-fill fs-1 text-secondary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1">Sajana</h4>
+                        <p class="text-primary small fw-bold mb-3">Full Stack Developer</p>
+                        <a href="https://github.com/sajana1999" target="_blank" class="btn btn-dark w-100">
+                            <i class="bi bi-github me-2"></i>GitHub Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

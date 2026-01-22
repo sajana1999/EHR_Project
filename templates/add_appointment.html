@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h4 class="mb-0 fw-bold text-primary">New Appointment</h4>
+                    <p class="text-muted small mb-0">Patient: {{ patient.first_name }} {{ patient.last_name }}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">DATE</label>
+                                <input type="date" name="appointment_date" class="form-control"
+                                    value="{{ default_date }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">WEIGHT (kg)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.1" name="weight" class="form-control"
+                                        placeholder="0.0">
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">DIAGNOSIS</label>
+                            <input type="text" name="diagnosis" class="form-control" placeholder="Primary Diagnosis">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">CLINICAL NOTES</label>
+                            <textarea name="clinical_notes" class="form-control" rows="4"
+                                placeholder="Enter findings, symptoms, and observations..."></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted">PRESCRIPTION</label>
+                            <textarea name="prescription" class="form-control bg-light" rows="3"
+                                placeholder="Medications, dosage, instructions..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/manage_appointments/{{ patient.id }}"
+                                class="btn btn-link text-decoration-none text-muted">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">Save
+                                Appointment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

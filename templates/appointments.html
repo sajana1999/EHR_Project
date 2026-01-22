@@ -1,0 +1,257 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    .queue-card {
+        transition: all 0.2s;
+        cursor: pointer;
+        border-left: 4px solid transparent;
+    }
+
+    .queue-card:hover {
+        background-color: #f8f9fa;
+        transform: translateX(4px);
+    }
+
+    .queue-card.active {
+        background-color: #e7f1ff;
+        border-left-color: #0d6efd;
+    }
+
+    .vitals-input-group .input-group-text {
+        background-color: #f8f9fa;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #6c757d;
+        width: 80px;
+    }
+
+    .station-header {
+        background: linear-gradient(to right, #ffffff, #f8f9fa);
+    }
+</style>
+
+<div class="row h-100 g-0">
+    <!-- LEFT PANEL: QUEUE & SEARCH -->
+    <div class="col-md-4 col-xl-3 border-end bg-white d-flex flex-column h-100" id="queuePanel"
+        style="min-height: calc(100vh - 80px);">
+        <div class="p-3 border-bottom station-header">
+            <h6 class="fw-bold text-dark mb-1"><i class="bi bi-people me-2 text-primary"></i>Daily Queue</h6>
+            <div class="text-muted small">{{ get_today_date }}</div>
+        </div>
+
+        <!-- Search -->
+        <div class="p-3 border-bottom bg-light">
+            <div class="position-relative">
+                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                <input type="text" id="patientSearch" class="form-control rounded-pill ps-5 border-0 shadow-sm"
+                    placeholder="Find patient..." autocomplete="off">
+                <div id="searchResults" class="list-group position-absolute w-100 mt-2 shadow-lg"
+                    style="z-index: 1050; display: none;"></div>
+            </div>
+        </div>
+
+        <!-- List -->
+        <div class="flex-grow-1 overflow-auto bg-light">
+            {% if today_appts %}
+            <div class="list-group list-group-flush" id="queueList">
+                {% for appt in today_appts %}
+                <div class="list-group-item list-group-item-action p-3 queue-card border-bottom"
+                    data-appt='{{ appt | tojson | forceescape }}'
+                    onclick="startEncounter(this, JSON.parse(this.dataset.appt))">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold text-dark">{{ appt.first_name }} {{ appt.last_name }}</span>
+                        <span
+                            class="badge {% if appt.status == 'Completed' %}bg-success-subtle text-success{% else %}bg-primary-subtle text-primary{% endif %} rounded-pill ultra-small">{{
+                            appt.appointment_time }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div class="small text-muted text-truncate" style="max-width: 180px;">{{ appt.reason_for_visit
+                            }}</div>
+                        {% if appt.status == 'Completed' %}
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center p-5 text-muted opacity-50">
+                <i class="bi bi-cup-hot display-4 mb-3"></i>
+                <p>No appointments today.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: WORKSPACE -->
+    <div class="col-md-8 col-xl-9 bg-light h-100 overflow-auto">
+        <!-- Empty State -->
+        <div id="emptyState" class="d-flex flex-column align-items-center justify-content-center h-100 p-5 text-muted">
+            <div class="bg-white p-4 rounded-circle shadow-sm mb-4">
+                <i class="bi bi-clipboard-pulse display-1 text-primary opacity-50"></i>
+            </div>
+            <h3>Clinical Station</h3>
+            <p>Select a patient from the queue to start an encounter.</p>
+        </div>
+
+        <!-- Encounter Form -->
+        <div id="encounterWorkspace" class="d-none p-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+                <!-- Header -->
+                <div
+                    class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary-subtle text-primary rounded-circle p-2 me-3 fw-bold" id="avatarInitials">
+                            JD</div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0" id="encPatientName">Patient Name</h5>
+                            <span class="text-muted small" id="encPatientDetails">ID: -- | Age: --</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill" id="encStatusBadge">In
+                        Progress</span>
+                </div>
+
+                <!-- Form -->
+                <div class="card-body p-4">
+                    <form method="POST" action="/appointments" enctype="multipart/form-data">
+                        <input type="hidden" name="appointment_id" id="encApptId">
+                        <input type="hidden" name="patient_id" id="encPatientId">
+
+                        <!-- Vitals Section -->
+                        <div class="p-3 bg-light rounded-3 mb-4 border border-light-subtle">
+                            <h6 class="text-uppercase text-secondary fw-bold small mb-3 ls-1"><i
+                                    class="bi bi-activity me-2"></i>Vitals Entry</h6>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">BP</span>
+                                        <input type="text" name="blood_pressure" id="encBP" class="form-control"
+                                            placeholder="--/--">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">Temp</span>
+                                        <input type="number" step="0.1" name="temperature" id="encTemp"
+                                            class="form-control" placeholder="--">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">Pulse</span>
+                                        <input type="number" name="pulse_rate" id="encPulse" class="form-control"
+                                            placeholder="--">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="input-group vitals-input-group shadow-sm">
+                                        <span class="input-group-text">SpO2</span>
+                                        <input type="number" name="sp_o2" id="encSpO2" class="form-control"
+                                            placeholder="--">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Findings -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-7">
+                                <label class="form-label small fw-bold text-secondary">CLINICAL NOTES (SOAP)</label>
+                                <textarea name="clinical_notes" id="encNotes" class="form-control shadow-sm" rows="12"
+                                    placeholder="Subjective, Objective, Assessment, Plan..."
+                                    style="resize: none;"></textarea>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-secondary">FINAL DIAGNOSIS</label>
+                                    <input type="text" name="final_diagnosis" id="encDiagnosis"
+                                        class="form-control shadow-sm fw-bold" placeholder="Primary Diagnosis">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-secondary">PRESCRIPTION / RX</label>
+                                    <textarea name="prescription" id="encPrescription"
+                                        class="form-control shadow-sm bg-info-subtle border-info-subtle" rows="5"
+                                        placeholder="Medications, Dosage, Frequency..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-secondary">ATTACHMENTS</label>
+                                    <input class="form-control form-control-sm" type="file" name="medical_docs"
+                                        multiple>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end pt-3 border-top">
+                            <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm fw-bold">
+                                <i class="bi bi-save me-2"></i>Finalize Encounter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('patientSearch');
+    const resultsDiv = document.getElementById('searchResults');
+
+    function startEncounter(element, appt) {
+        // UI State
+        document.querySelectorAll('.queue-card').forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        document.getElementById('emptyState').classList.add('d-none');
+        document.getElementById('encounterWorkspace').classList.remove('d-none');
+
+        // Populate Header
+        document.getElementById('encPatientName').innerText = appt.first_name + ' ' + appt.last_name;
+        document.getElementById('avatarInitials').innerText = (appt.first_name[0] + appt.last_name[0]).toUpperCase();
+        document.getElementById('encPatientDetails').innerText = `ID: ${appt.insurance_number} | Age: ${appt.age}`;
+
+        // Populate Form
+        document.getElementById('encApptId').value = appt.id;
+        document.getElementById('encPatientId').value = appt.patient_id;
+
+        document.getElementById('encBP').value = appt.blood_pressure || '';
+        document.getElementById('encTemp').value = appt.temperature || '';
+        document.getElementById('encPulse').value = appt.pulse_rate || '';
+        document.getElementById('encSpO2').value = appt.sp_o2 || '';
+
+        document.getElementById('encDiagnosis').value = appt.final_diagnosis || appt.reason_for_visit || '';
+        document.getElementById('encNotes').value = appt.clinical_notes || '';
+        document.getElementById('encPrescription').value = appt.prescription || '';
+
+        // Status Badge
+        const badge = document.getElementById('encStatusBadge');
+        if (appt.status === 'Completed') {
+            badge.className = 'badge bg-success text-white px-3 py-2 rounded-pill';
+            badge.innerText = 'Completed';
+        } else {
+            badge.className = 'badge bg-warning text-dark px-3 py-2 rounded-pill';
+            badge.innerText = 'In Progress';
+        }
+    }
+
+    // Search (UX: Just highlight or filter list? Because this is TODAY's queue)
+    // The prompt implies we might search for a patient to open their encounter.
+    // However, encounters are usually tied to appointments.
+    // Let's implement filter for the left list.
+    searchInput.addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const items = document.querySelectorAll('.queue-card');
+        items.forEach(item => {
+            const text = item.innerText.toLowerCase();
+            if (text.includes(query)) {
+                item.classList.remove('d-none');
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+    });
+</script>
+{% endblock %}

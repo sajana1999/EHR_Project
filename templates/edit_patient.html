@@ -1,0 +1,177 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="d-flex align-items-center mb-4 justify-content-between">
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-white shadow-sm rounded-3 me-3"><i
+                        class="bi bi-arrow-left"></i></a>
+                <div>
+                    <h4 class="fw-bold text-dark mb-0">Edit Profile</h4>
+                    <p class="text-muted small mb-0">Update patient demographics and details.</p>
+                </div>
+            </div>
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-3">MRN: {{ patient.id }}</span>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <form method="POST" action="/update_patient/{{ patient.id }}" enctype="multipart/form-data">
+                    <div class="row">
+                        <!-- Profile Image Section -->
+                        <div class="col-md-3 text-center mb-4 mb-md-0 border-end border-light">
+                            <div class="position-relative d-inline-block">
+                                <img id="preview"
+                                    src="{{ url_for('static', filename='uploads/' + patient.image_path) if patient.image_path else 'https://via.placeholder.com/150' }}"
+                                    class="rounded-circle shadow-sm border border-4 border-white mb-3"
+                                    style="width: 140px; height: 140px; object-fit: cover;">
+                                <label
+                                    class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0 mb-3 me-2 shadow-sm"
+                                    style="width: 32px; height: 32px; padding: 0.25rem;">
+                                    <i class="bi bi-camera-fill"></i>
+                                    <input type="file" name="patient_img" class="d-none" onchange="previewImage(event)">
+                                </label>
+                            </div>
+                            <h6 class="fw-bold text-dark mt-2">Profile Photo</h6>
+                            <p class="text-muted small">Allowed: JPG, PNG</p>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="col-md-9 ps-md-5">
+                            <h6 class="text-uppercase text-primary text-xs fw-bolder mb-3 letter-spacing-1">Demographics
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="first_name" class="form-control" id="firstName"
+                                            placeholder="First Name" value="{{ patient.first_name }}" required>
+                                        <label for="firstName">First Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="last_name" class="form-control" id="lastName"
+                                            placeholder="Last Name" value="{{ patient.last_name }}" required>
+                                        <label for="lastName">Last Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="number" name="age" class="form-control" id="age" placeholder="Age"
+                                            value="{{ patient.age }}" required>
+                                        <label for="age">Age</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select name="gender" class="form-select" id="gender">
+                                            <option value="Male" {% if patient.gender=='Male' %}selected{% endif %}>Male
+                                            </option>
+                                            <option value="Female" {% if patient.gender=='Female' %}selected{% endif %}>
+                                                Female</option>
+                                            <option value="Other" {% if patient.gender=='Other' %}selected{% endif %}>
+                                                Other</option>
+                                        </select>
+                                        <label for="gender">Gender</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="text" name="insurance_number" class="form-control" id="insurance"
+                                            placeholder="Insurance ID" value="{{ patient.insurance_number }}">
+                                        <label for="insurance">Insurance ID</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <input type="date" name="created_at" class="form-control" id="reg_date"
+                                            value="{{ patient.created_at.strftime('%Y-%m-%d') if patient.created_at else '' }}">
+                                        <label for="reg_date">Registration Date</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="text-uppercase text-primary text-xs fw-bolder mb-3 letter-spacing-1">Contact
+                                Information</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" name="email" class="form-control" id="email"
+                                            placeholder="Email" value="{{ patient.email or '' }}">
+                                        <label for="email">Email Address</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="tel" name="phone" class="form-control" id="phone"
+                                            placeholder="Phone" value="{{ patient.phone or '' }}">
+                                        <label for="phone">Phone Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea name="address" class="form-control" id="address" placeholder="Address"
+                                            style="height: 80px">{{ patient.address or '' }}</textarea>
+                                        <label for="address">Full Address</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-check form-switch p-3 bg-light rounded-3">
+                                <input class="form-check-input" type="checkbox" name="allergies" id="allergySwitch" {%
+                                    if patient.has_allergies=='Yes' %}checked{% endif %}>
+                                <label class="form-check-label ms-2 fw-bold text-dark" for="allergySwitch">Flag as
+                                    Allergy Risk</label>
+                                <div class="text-muted small ms-2 ps-4">Patient reports known drug or environmental
+                                    allergies.</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                                <button type="button"
+                                    class="btn btn-outline-danger btn-sm border-0 bg-danger bg-opacity-10 text-danger fw-bold"
+                                    onclick="confirmDelete()">
+                                    <i class="bi bi-trash me-1"></i>Delete Record
+                                </button>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('patient_details', id=patient.id) }}"
+                                        class="btn btn-light px-4">View Profile</a>
+                                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">Save
+                                        Changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var output = document.getElementById('preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function confirmDelete() {
+        Swal.fire({
+            title: 'Delete this patient?',
+            text: "All appointments and documents will also be deleted.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, delete everything'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/delete_patient/{{ patient.id }}";
+            }
+        })
+    }
+</script>
+{% endblock %}
