@@ -759,20 +759,27 @@ def update_patient(id):
     update_query = """UPDATE patients SET 
                       first_name=%s, last_name=%s, insurance_number=%s, age=%s, 
                       gender=%s, has_allergies=%s, created_at=%s,
-                      email=%s, phone=%s, address=%s
+                      email=%s, phone=%s, address=%s, medical_history=%s
                       WHERE id=%s"""
     
-    # Handle created_at override if provided, else keep existing?
-    # Usually we don't update Registration Date unless necessary. 
-    # But user asked for "editing of... Registration Date".
-    # Ensure form sends `created_at`.
+    # Handle Allergies (List to Comma-String)
+    allergy_list = request.form.getlist('allergies')
+    other_allergy = request.form.get('other_allergy')
     
+    if other_allergy and other_allergy.strip():
+        allergy_list.append(other_allergy.strip())
+        
+    # If list is empty -> 'No' (or empty string?), but let's stick to 'No' if that is the convention,
+    # or just join them. The existing add_patient uses 'No' if empty.
+    has_allergies = ", ".join(allergy_list) if allergy_list else 'No'
+
     cur.execute(update_query, (
         request.form.get('first_name'), request.form.get('last_name'), request.form.get('insurance_number'),
         request.form.get('age'), request.form.get('gender'),
-        'Yes' if request.form.get('allergies') else 'No',
+        has_allergies,
         request.form.get('created_at'),
         request.form.get('email'), request.form.get('phone'), request.form.get('address'),
+        request.form.get('medical_history'),
         id
     ))
     

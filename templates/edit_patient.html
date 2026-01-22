@@ -118,13 +118,50 @@
                                 </div>
                             </div>
 
-                            <div class="form-check form-switch p-3 bg-light rounded-3">
-                                <input class="form-check-input" type="checkbox" name="allergies" id="allergySwitch" {%
-                                    if patient.has_allergies=='Yes' %}checked{% endif %}>
-                                <label class="form-check-label ms-2 fw-bold text-dark" for="allergySwitch">Flag as
-                                    Allergy Risk</label>
-                                <div class="text-muted small ms-2 ps-4">Patient reports known drug or environmental
-                                    allergies.</div>
+                            <h6 class="text-uppercase text-primary text-xs fw-bolder mb-3 letter-spacing-1">Medical
+                                Background</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea name="medical_history" class="form-control" id="history"
+                                            placeholder="Medical History"
+                                            style="height: 100px">{{ patient.medical_history or '' }}</textarea>
+                                        <label for="history">Past Medical History / Chronic Conditions</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ALLERGIES SECTION -->
+                            <div class="bg-light p-4 rounded-3 border">
+                                <h6 class="text-uppercase text-secondary small fw-bold mb-3">Allergies Information</h6>
+                                <div class="row">
+                                    {% for allergy in ['Penicillin', 'Peanuts', 'Latex', 'Pollen', 'Shellfish', 'Dairy',
+                                    'Dust Mites'] %}
+                                    <div class="col-md-4 col-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="allergies"
+                                                value="{{ allergy }}" id="allergy{{ loop.index }}" {% if allergy in
+                                                patient.has_allergies %} checked {% endif %}>
+                                            <label class="form-check-label" for="allergy{{ loop.index }}">
+                                                {{ allergy }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                    <!-- 'Other' Option -->
+                                    <div class="col-md-12 mt-2">
+                                        <div class="form-check d-flex align-items-center">
+                                            <input class="form-check-input me-2" type="checkbox" id="checkOther"
+                                                onclick="document.getElementById('otherInput').disabled = !this.checked; document.getElementById('otherInput').focus();">
+                                            <label class="form-check-label me-2 text-nowrap"
+                                                for="checkOther">Other:</label>
+                                            <input type="text" name="other_allergy" id="otherInput"
+                                                class="form-control form-control-sm border-0 border-bottom bg-transparent rounded-0"
+                                                placeholder="Specify..." disabled>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
